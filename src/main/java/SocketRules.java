@@ -1,6 +1,6 @@
 import java.io.InputStream;
 
-public interface Socket {
+public interface SocketRules {
 
     InputStream getInputStream();
 }

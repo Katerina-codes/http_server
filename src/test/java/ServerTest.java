@@ -47,7 +47,7 @@ public class ServerTest {
     public void serverReadsInputFromClientSocket() {
         Server server = new Server("localhost", 5000);
         ByteArrayInputStream inputStream = new ByteArrayInputStream("request".getBytes());
-        Socket clientSocketSpy = new ServerSocketSpy.ClientSocketSpy(inputStream);
+        SocketRules clientSocketSpy = new ServerSocketSpy.ClientSocketSpy(inputStream);
         ServerSocketSpy serverSocketSpy = new ServerSocketSpy(clientSocketSpy);
 
         server.run(serverSocketSpy);
