@@ -1,5 +1,7 @@
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 public class ServerSocketSpy implements ServerSocketManager {
 
@@ -16,17 +18,26 @@ public class ServerSocketSpy implements ServerSocketManager {
     }
 
     public static class ClientSocketSpy implements SocketRules {
-        
-        public ClientSocketSpy(ByteArrayInputStream inputStream) {
+
+        private InputStream inputStream;
+        private ByteArrayOutputStream outputStream;
+        public boolean getOutputStreamWasCalled = false;
+        public boolean getInputStreamWasCalled = false;
+
+        public ClientSocketSpy(ByteArrayInputStream inputStream, ByteArrayOutputStream outputStream) {
             this.inputStream = inputStream;
+            this.outputStream = outputStream;
         }
 
-        public boolean getInputStreamWasCalled = false;
-        private InputStream inputStream;
 
         public InputStream getInputStream() {
             getInputStreamWasCalled = true;
             return inputStream;
+        }
+
+        public OutputStream getOutputStream() {
+            getOutputStreamWasCalled = true;
+            return null;
         }
     }
 }

@@ -16,6 +16,7 @@ public class Server {
     public void run(ServerSocketManager socketManager) {
         SocketRules clientSocket = socketManager.accept();
         readFromSocketStream(clientSocket);
+        clientSocket.getOutputStream();
     }
 
     private void readFromSocketStream(SocketRules clientSocket) {
