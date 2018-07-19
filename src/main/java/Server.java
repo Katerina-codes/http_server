@@ -9,7 +9,8 @@ public class Server {
     }
 
     public void run(ServerSocketManager socketManager) {
-        socketManager.accept();
+        Socket clientSocket = socketManager.accept();
+        clientSocket.getInputStream();
     }
 
 }

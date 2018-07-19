@@ -28,4 +28,14 @@ public class ServerTest {
 
         assertEquals(5000, server.port);
     }
+
+    @Test
+    public void serverCreatesInputSteam() {
+        Server server = new Server("localhost", 5000);
+        ServerSocketSpy serverSocketSpy = new ServerSocketSpy();
+
+        server.run(serverSocketSpy);
+
+        assertTrue(serverSocketSpy.clientSocketSpy.getInputStreamWasCalled);
+    }
 }
