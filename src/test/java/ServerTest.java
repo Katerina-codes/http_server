@@ -1,3 +1,4 @@
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -8,10 +9,19 @@ import static org.junit.Assert.assertEquals;
 
 public class ServerTest {
 
+    private Server server;
+    private ServerSocketSpy.ClientSocketSpy clientSocketSpy;
+    private ByteArrayOutputStream outputStream;
+
+    @Before
+    public void setUp() {
+        server = new Server("localhost", 5000);
+        outputStream = new ByteArrayOutputStream();
+        clientSocketSpy = new ServerSocketSpy.ClientSocketSpy(new ByteArrayInputStream("".getBytes()), outputStream);
+    }
+
     @Test
     public void testsAConnectionCanBeMade() {
-        Server server = new Server("localhost", 5000);
-        ServerSocketSpy.ClientSocketSpy clientSocketSpy = new ServerSocketSpy.ClientSocketSpy(new ByteArrayInputStream("".getBytes()), new ByteArrayOutputStream());
         ServerSocketSpy serverSocketSpy = new ServerSocketSpy(clientSocketSpy);
 
         server.run(serverSocketSpy);
@@ -35,8 +45,6 @@ public class ServerTest {
 
     @Test
     public void createsInputSteam() {
-        Server server = new Server("localhost", 5000);
-        ServerSocketSpy.ClientSocketSpy clientSocketSpy = new ServerSocketSpy.ClientSocketSpy(new ByteArrayInputStream("".getBytes()), new ByteArrayOutputStream());
         ServerSocketSpy serverSocketSpy = new ServerSocketSpy(clientSocketSpy);
 
         server.run(serverSocketSpy);
@@ -46,9 +54,8 @@ public class ServerTest {
 
     @Test
     public void readsInputFromClientSocket() {
-        Server server = new Server("localhost", 5000);
         ByteArrayInputStream inputStream = new ByteArrayInputStream("request".getBytes());
-        ServerSocketSpy.ClientSocketSpy clientSocketSpy = new ServerSocketSpy.ClientSocketSpy(inputStream, new ByteArrayOutputStream());
+        ServerSocketSpy.ClientSocketSpy clientSocketSpy = new ServerSocketSpy.ClientSocketSpy(inputStream, outputStream);
         ServerSocketSpy serverSocketSpy = new ServerSocketSpy(clientSocketSpy);
 
         server.run(serverSocketSpy);
@@ -58,8 +65,6 @@ public class ServerTest {
 
     @Test
     public void createsOutputStream() {
-        Server server = new Server("localhost", 5000);
-        ServerSocketSpy.ClientSocketSpy clientSocketSpy = new ServerSocketSpy.ClientSocketSpy(new ByteArrayInputStream("".getBytes()), new ByteArrayOutputStream());
         ServerSocketSpy serverSocketSpy = new ServerSocketSpy(clientSocketSpy);
 
         server.run(serverSocketSpy);
