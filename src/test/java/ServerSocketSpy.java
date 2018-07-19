@@ -1,23 +1,32 @@
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 public class ServerSocketSpy implements ServerSocketManager {
 
-    public ClientSocketSpy clientSocketSpy;
+    public Socket clientSocketSpy;
     boolean acceptWasCalled = false;
+
+    public ServerSocketSpy(Socket clientSocketSpy) {
+        this.clientSocketSpy = clientSocketSpy;
+    }
 
     public Socket accept() {
         acceptWasCalled = true;
-        clientSocketSpy = new ClientSocketSpy();
         return clientSocketSpy;
     }
 
-    public class ClientSocketSpy implements Socket {
+    public static class ClientSocketSpy implements Socket {
+        
+        public ClientSocketSpy(ByteArrayInputStream inputStream) {
+            this.inputStream = inputStream;
+        }
 
         public boolean getInputStreamWasCalled = false;
+        private InputStream inputStream;
 
         public InputStream getInputStream() {
             getInputStreamWasCalled = true;
-            return null;
+            return inputStream;
         }
     }
 }
