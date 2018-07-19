@@ -12,18 +12,18 @@ public class ServerTest {
     private Server server;
     private ServerSocketSpy.ClientSocketSpy clientSocketSpy;
     private ByteArrayOutputStream outputStream;
+    private ServerSocketSpy serverSocketSpy;
 
     @Before
     public void setUp() {
         server = new Server("localhost", 5000);
         outputStream = new ByteArrayOutputStream();
         clientSocketSpy = new ServerSocketSpy.ClientSocketSpy(new ByteArrayInputStream("".getBytes()), outputStream);
+        serverSocketSpy = new ServerSocketSpy(clientSocketSpy);
     }
 
     @Test
     public void testsAConnectionCanBeMade() {
-        ServerSocketSpy serverSocketSpy = new ServerSocketSpy(clientSocketSpy);
-
         server.run(serverSocketSpy);
 
         assertTrue(serverSocketSpy.acceptWasCalled);
@@ -45,8 +45,6 @@ public class ServerTest {
 
     @Test
     public void createsInputSteam() {
-        ServerSocketSpy serverSocketSpy = new ServerSocketSpy(clientSocketSpy);
-
         server.run(serverSocketSpy);
 
         assertTrue(clientSocketSpy.getInputStreamWasCalled);
@@ -65,8 +63,6 @@ public class ServerTest {
 
     @Test
     public void createsOutputStream() {
-        ServerSocketSpy serverSocketSpy = new ServerSocketSpy(clientSocketSpy);
-
         server.run(serverSocketSpy);
 
         assertTrue(clientSocketSpy.getOutputStreamWasCalled);
