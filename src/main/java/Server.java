@@ -14,11 +14,11 @@ public class Server {
     }
 
     public void run(ServerSocketManager socketManager) {
-        Socket clientSocket = socketManager.accept();
+        SocketRules clientSocket = socketManager.accept();
         readFromSocketStream(clientSocket);
     }
 
-    private void readFromSocketStream(Socket clientSocket) {
+    private void readFromSocketStream(SocketRules clientSocket) {
         InputStream request = clientSocket.getInputStream();
         InputStreamReader requestReader = new InputStreamReader(request);
         BufferedReader lineReader = new BufferedReader(requestReader);

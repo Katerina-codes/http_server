@@ -3,19 +3,19 @@ import java.io.InputStream;
 
 public class ServerSocketSpy implements ServerSocketManager {
 
-    public Socket clientSocketSpy;
+    public SocketRules clientSocketSpy;
     boolean acceptWasCalled = false;
 
-    public ServerSocketSpy(Socket clientSocketSpy) {
+    public ServerSocketSpy(SocketRules clientSocketSpy) {
         this.clientSocketSpy = clientSocketSpy;
     }
 
-    public Socket accept() {
+    public SocketRules accept() {
         acceptWasCalled = true;
         return clientSocketSpy;
     }
 
-    public static class ClientSocketSpy implements Socket {
+    public static class ClientSocketSpy implements SocketRules {
         
         public ClientSocketSpy(ByteArrayInputStream inputStream) {
             this.inputStream = inputStream;
