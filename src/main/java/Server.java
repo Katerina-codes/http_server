@@ -1,7 +1,4 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 
 public class Server {
 
@@ -15,19 +12,25 @@ public class Server {
 
     public void run(ServerSocketManager socketManager) {
         SocketRules clientSocket = socketManager.accept();
-        readFromSocketStream(clientSocket);
-        clientSocket.getOutputStream();
+        String request = readFromSocketStream(clientSocket);
+
+        OutputStream output = clientSocket.getOutputStream();
+        PrintWriter writer = new PrintWriter(output);
+        writer.println(request);
+        writer.flush();
     }
 
-    private void readFromSocketStream(SocketRules clientSocket) {
+    private String readFromSocketStream(SocketRules clientSocket) {
         InputStream request = clientSocket.getInputStream();
         InputStreamReader requestReader = new InputStreamReader(request);
         BufferedReader lineReader = new BufferedReader(requestReader);
+        String requestContent = "";
         try {
-            lineReader.readLine();
+           requestContent = lineReader.readLine();
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return requestContent;
     }
 
 }

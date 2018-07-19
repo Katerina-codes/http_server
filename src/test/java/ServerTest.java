@@ -13,12 +13,14 @@ public class ServerTest {
     private ServerSocketSpy.ClientSocketSpy clientSocketSpy;
     private ByteArrayOutputStream outputStream;
     private ServerSocketSpy serverSocketSpy;
+    private ByteArrayInputStream inputStream;
 
     @Before
     public void setUp() {
         server = new Server("localhost", 5000);
         outputStream = new ByteArrayOutputStream();
-        clientSocketSpy = new ServerSocketSpy.ClientSocketSpy(new ByteArrayInputStream("".getBytes()), outputStream);
+        inputStream = new ByteArrayInputStream("".getBytes());
+        clientSocketSpy = new ServerSocketSpy.ClientSocketSpy(inputStream, outputStream);
         serverSocketSpy = new ServerSocketSpy(clientSocketSpy);
     }
 
@@ -66,5 +68,16 @@ public class ServerTest {
         server.run(serverSocketSpy);
 
         assertTrue(clientSocketSpy.getOutputStreamWasCalled);
+    }
+
+    @Test
+    public void writeOutputToClientSocket() {
+        ByteArrayInputStream inputStream = new ByteArrayInputStream("request".getBytes());
+        ServerSocketSpy.ClientSocketSpy clientSocketSpy = new ServerSocketSpy.ClientSocketSpy(inputStream, outputStream);
+        ServerSocketSpy serverSocketSpy = new ServerSocketSpy(clientSocketSpy);
+
+        server.run(serverSocketSpy);
+
+        assertEquals("request\n", clientSocketSpy.getOutputStreamContents());
     }
 }

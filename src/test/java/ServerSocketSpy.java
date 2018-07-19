@@ -37,7 +37,11 @@ public class ServerSocketSpy implements ServerSocketManager {
 
         public OutputStream getOutputStream() {
             getOutputStreamWasCalled = true;
-            return null;
+            return outputStream;
+        }
+
+        public String getOutputStreamContents() {
+            return outputStream.toString();
         }
     }
 }
