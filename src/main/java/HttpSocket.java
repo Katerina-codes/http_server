@@ -21,6 +21,12 @@ public class HttpSocket implements ClientSocket {
 
     @Override
     public OutputStream getOutputStream() {
-        return null;
+        OutputStream output = null;
+        try {
+            output = socket.getOutputStream();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return output;
     }
 }
