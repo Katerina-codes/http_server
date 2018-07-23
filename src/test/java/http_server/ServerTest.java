@@ -1,8 +1,9 @@
+package http_server;
+
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.*;
-import java.net.Socket;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
@@ -13,13 +14,12 @@ public class ServerTest {
     private ServerSocketSpy.ClientSocketSpy clientSocketSpy;
     private ByteArrayOutputStream outputStream;
     private ServerSocketSpy serverSocketSpy;
-    private ByteArrayInputStream inputStream;
 
     @Before
     public void setUp() {
         server = new Server("localhost", 5000);
         outputStream = new ByteArrayOutputStream();
-        inputStream = new ByteArrayInputStream("".getBytes());
+        ByteArrayInputStream inputStream = new ByteArrayInputStream("".getBytes());
         clientSocketSpy = new ServerSocketSpy.ClientSocketSpy(inputStream, outputStream);
         serverSocketSpy = new ServerSocketSpy(clientSocketSpy);
     }

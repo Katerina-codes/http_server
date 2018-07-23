@@ -1,3 +1,5 @@
+package http_server;
+
 import org.junit.Test;
 
 import java.io.*;
