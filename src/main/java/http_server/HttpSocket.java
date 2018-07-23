@@ -10,7 +10,6 @@ public class HttpSocket implements ClientSocket {
         this.socket = socket;
     }
 
-    @Override
     public InputStream getInputStream() {
         InputStream input = null;
         try {
@@ -21,7 +20,6 @@ public class HttpSocket implements ClientSocket {
         return input;
     }
 
-    @Override
     public OutputStream getOutputStream() {
         OutputStream output = null;
         try {
