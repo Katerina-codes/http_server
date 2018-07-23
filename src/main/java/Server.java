@@ -11,7 +11,7 @@ public class Server {
     }
 
     public void run(ServerSocketManager socketManager) {
-        SocketRules clientSocket = socketManager.accept();
+        ClientSocket clientSocket = socketManager.accept();
         String request = readFromSocketStream(clientSocket);
 
         OutputStream output = clientSocket.getOutputStream();
@@ -20,13 +20,13 @@ public class Server {
         writer.flush();
     }
 
-    private String readFromSocketStream(SocketRules clientSocket) {
+    private String readFromSocketStream(ClientSocket clientSocket) {
         InputStream request = clientSocket.getInputStream();
         InputStreamReader requestReader = new InputStreamReader(request);
         BufferedReader lineReader = new BufferedReader(requestReader);
         String requestContent = "";
         try {
-           requestContent = lineReader.readLine();
+            requestContent = lineReader.readLine();
         } catch (IOException e) {
             e.printStackTrace();
         }

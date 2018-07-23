@@ -5,19 +5,19 @@ import java.io.OutputStream;
 
 public class ServerSocketSpy implements ServerSocketManager {
 
-    public SocketRules clientSocketSpy;
+    public ClientSocket clientSocketSpy;
     boolean acceptWasCalled = false;
 
-    public ServerSocketSpy(SocketRules clientSocketSpy) {
+    public ServerSocketSpy(ClientSocket clientSocketSpy) {
         this.clientSocketSpy = clientSocketSpy;
     }
 
-    public SocketRules accept() {
+    public ClientSocket accept() {
         acceptWasCalled = true;
         return clientSocketSpy;
     }
 
-    public static class ClientSocketSpy implements SocketRules {
+    public static class ClientSocketSpy implements ClientSocket {
 
         private InputStream inputStream;
         private ByteArrayOutputStream outputStream;
@@ -28,7 +28,6 @@ public class ServerSocketSpy implements ServerSocketManager {
             this.inputStream = inputStream;
             this.outputStream = outputStream;
         }
-
 
         public InputStream getInputStream() {
             getInputStreamWasCalled = true;

@@ -1,8 +1,8 @@
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.*;
+import java.net.Socket;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;

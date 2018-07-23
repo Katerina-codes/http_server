@@ -1,7 +1,7 @@
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public interface SocketRules {
+public interface ClientSocket {
     InputStream getInputStream();
     OutputStream getOutputStream();
 }

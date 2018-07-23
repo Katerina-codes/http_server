@@ -1,3 +1,3 @@
 public interface ServerSocketManager {
-    SocketRules accept();
+    ClientSocket accept();
 }
