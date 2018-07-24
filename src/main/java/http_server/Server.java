@@ -13,19 +13,27 @@ public class Server {
     }
 
     public void run(ServerSocketManager socketManager) {
-        ClientSocket clientSocket = socketManager.accept();
-        String request = readFromSocketStream(clientSocket);
+        boolean serverRunning = true;
+        while (serverRunning) {
+            ClientSocket clientSocket = socketManager.accept();
+            String request = readFromSocketStream(clientSocket);
 
-        OutputStream output = clientSocket.getOutputStream();
-        PrintWriter writer = new PrintWriter(output);
-        writer.println(request);
-        writer.flush();
+            OutputStream output = clientSocket.getOutputStream();
+            PrintWriter writer = new PrintWriter(output);
+            writer.println("HTTP/1.1 200 OK" + request);
+            writer.flush();
+            serverRunning = false;
+        }
     }
 
     private String readFromSocketStream(ClientSocket clientSocket) {
         InputStream request = clientSocket.getInputStream();
         InputStreamReader requestReader = new InputStreamReader(request);
         BufferedReader lineReader = new BufferedReader(requestReader);
+        return parseRequest(lineReader);
+    }
+
+    private String parseRequest(BufferedReader lineReader) {
         String requestContent = "";
         try {
             requestContent = lineReader.readLine();

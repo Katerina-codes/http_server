@@ -71,13 +71,14 @@ public class ServerTest {
     }
 
     @Test
-    public void writeOutputToClientSocket() {
-        ByteArrayInputStream inputStream = new ByteArrayInputStream("request".getBytes());
+    public void writeResponseToClientSocket() {
+        ByteArrayInputStream inputStream = new ByteArrayInputStream("\n".getBytes());
         ServerSocketSpy.ClientSocketSpy clientSocketSpy = new ServerSocketSpy.ClientSocketSpy(inputStream, outputStream);
         ServerSocketSpy serverSocketSpy = new ServerSocketSpy(clientSocketSpy);
 
         server.run(serverSocketSpy);
 
-        assertEquals("request\n", clientSocketSpy.getOutputStreamContents());
+        assertEquals("HTTP/1.1 200 OK\n", clientSocketSpy.getOutputStreamContents());
     }
+
 }
