@@ -15,4 +15,14 @@ public class RequestParserTest {
 
         assertEquals("file1", requestParser.parse(request));
     }
+
+    @Test
+    public void returnsAnotherFileName() {
+        RequestParser requestParser = new RequestParser();
+
+        String request = "GET /file2 HTTP/1.1";
+        requestParser.parse(request);
+
+        assertEquals("file2", requestParser.parse(request));
+    }
 }
