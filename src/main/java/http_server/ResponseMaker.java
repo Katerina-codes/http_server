@@ -11,12 +11,12 @@ public class ResponseMaker {
     }
 
     public String returnFileContents(String file) {
-        byte[] encoded;
+        byte[] encodedContents;
         String contents = null;
         try {
             String filePath = String.format("public/%s", file);
-            encoded = Files.readAllBytes(Paths.get(filePath));
-            contents = new String(encoded, "US-ASCII");
+            encodedContents = Files.readAllBytes(Paths.get(filePath));
+            contents = new String(encodedContents, "US-ASCII");
         } catch (IOException e) {
             e.printStackTrace();
         }

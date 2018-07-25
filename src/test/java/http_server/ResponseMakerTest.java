@@ -19,4 +19,12 @@ public class ResponseMakerTest {
 
         assertEquals("file1 contents", responseMaker.returnFileContents("file1"));
     }
+
+    @Test
+    public void returnsNullIfFileDoesNotExist() {
+        ResponseMaker responseMaker = new ResponseMaker();
+
+        assertEquals(null, responseMaker.returnFileContents("file20"));
+    }
+
 }
