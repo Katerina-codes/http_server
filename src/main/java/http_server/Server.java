@@ -17,13 +17,16 @@ public class Server {
         while (serverRunning) {
             ClientSocket clientSocket = socketManager.accept();
             String request = readFromSocketStream(clientSocket);
-
-            OutputStream output = clientSocket.getOutputStream();
-            PrintWriter writer = new PrintWriter(output);
-            writer.println("HTTP/1.1 200 OK" + request);
-            writer.flush();
+            writeResponseToRequest(clientSocket, request);
             serverRunning = false;
         }
+    }
+
+    private void writeResponseToRequest(ClientSocket clientSocket, String request) {
+        OutputStream output = clientSocket.getOutputStream();
+        PrintWriter writer = new PrintWriter(output);
+        writer.println("HTTP/1.1 200 OK" + request);
+        writer.flush();
     }
 
     private String readFromSocketStream(ClientSocket clientSocket) {
