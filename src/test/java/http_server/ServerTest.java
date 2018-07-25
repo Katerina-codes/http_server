@@ -14,12 +14,13 @@ public class ServerTest {
     private ServerSocketSpy.ClientSocketSpy clientSocketSpy;
     private ByteArrayOutputStream outputStream;
     private ServerSocketSpy serverSocketSpy;
+    private ByteArrayInputStream inputStream;
 
     @Before
     public void setUp() {
         server = new Server("localhost", 5000);
         outputStream = new ByteArrayOutputStream();
-        ByteArrayInputStream inputStream = new ByteArrayInputStream("".getBytes());
+        inputStream = new ByteArrayInputStream("GET /file1 HTTP/1.0\n".getBytes());
         clientSocketSpy = new ServerSocketSpy.ClientSocketSpy(inputStream, outputStream);
         serverSocketSpy = new ServerSocketSpy(clientSocketSpy);
     }
@@ -54,7 +55,6 @@ public class ServerTest {
 
     @Test
     public void readsInputFromClientSocket() {
-        ByteArrayInputStream inputStream = new ByteArrayInputStream("request".getBytes());
         ServerSocketSpy.ClientSocketSpy clientSocketSpy = new ServerSocketSpy.ClientSocketSpy(inputStream, outputStream);
         ServerSocketSpy serverSocketSpy = new ServerSocketSpy(clientSocketSpy);
 
@@ -72,13 +72,13 @@ public class ServerTest {
 
     @Test
     public void writeResponseToClientSocket() {
-        ByteArrayInputStream inputStream = new ByteArrayInputStream("\n".getBytes());
         ServerSocketSpy.ClientSocketSpy clientSocketSpy = new ServerSocketSpy.ClientSocketSpy(inputStream, outputStream);
         ServerSocketSpy serverSocketSpy = new ServerSocketSpy(clientSocketSpy);
 
         server.run(serverSocketSpy);
 
-        assertEquals("HTTP/1.1 200 OK\n", clientSocketSpy.getOutputStreamContents());
+        assertEquals("HTTP/1.1 200 OK\n\n" +
+                "file1 contents\n", clientSocketSpy.getOutputStreamContents());
     }
 
 }

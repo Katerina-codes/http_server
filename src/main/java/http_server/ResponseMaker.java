@@ -25,7 +25,8 @@ public class ResponseMaker {
 
     public String buildWholeResponse(String fileContents) {
         String response = "";
-        response = response + statusResponse() + "\n";
+
+        response = response + statusResponse() + "\n\n";
         response = response + fileContents + "\n";
         return response;
     }

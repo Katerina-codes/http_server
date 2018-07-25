@@ -6,6 +6,8 @@ public class Server {
 
     public String host;
     public int port;
+    private RequestParser requestParser = new RequestParser();
+    private ResponseMaker responseMaker = new ResponseMaker();
 
     public Server(String host, int port) {
         this.host = host;
@@ -17,15 +19,18 @@ public class Server {
         while (serverRunning) {
             ClientSocket clientSocket = socketManager.accept();
             String request = readFromSocketStream(clientSocket);
-            writeResponseToRequest(clientSocket, request);
+            String fileRequested = requestParser.parse(request);
+            String fileContents = responseMaker.returnFileContents(fileRequested);
+            String response = responseMaker.buildWholeResponse(fileContents);
+            writeResponseToRequest(clientSocket, response);
             serverRunning = false;
         }
     }
 
-    private void writeResponseToRequest(ClientSocket clientSocket, String request) {
+    private void writeResponseToRequest(ClientSocket clientSocket, String response) {
         OutputStream output = clientSocket.getOutputStream();
         PrintWriter writer = new PrintWriter(output);
-        writer.println("HTTP/1.1 200 OK" + request);
+        writer.print(response);
         writer.flush();
     }
 
@@ -33,7 +38,7 @@ public class Server {
         InputStream request = clientSocket.getInputStream();
         InputStreamReader requestReader = new InputStreamReader(request);
         BufferedReader lineReader = new BufferedReader(requestReader);
-        return new RequestParser().parseRequest(lineReader);
+        return requestParser.parseRequest(lineReader);
     }
 
 }

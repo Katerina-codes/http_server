@@ -25,4 +25,5 @@ public class RequestParserTest {
 
         assertEquals("file2", requestParser.parse(request));
     }
+
 }
