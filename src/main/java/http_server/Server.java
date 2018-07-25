@@ -30,17 +30,7 @@ public class Server {
         InputStream request = clientSocket.getInputStream();
         InputStreamReader requestReader = new InputStreamReader(request);
         BufferedReader lineReader = new BufferedReader(requestReader);
-        return parseRequest(lineReader);
-    }
-
-    private String parseRequest(BufferedReader lineReader) {
-        String requestContent = "";
-        try {
-            requestContent = lineReader.readLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return requestContent;
+        return new RequestParser().parseRequest(lineReader);
     }
 
 }
