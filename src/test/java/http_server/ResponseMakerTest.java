@@ -27,4 +27,14 @@ public class ResponseMakerTest {
         assertEquals(null, responseMaker.returnFileContents("file20"));
     }
 
+    @Test
+    public void buildsWholeResponse() {
+        ResponseMaker responseMaker = new ResponseMaker();
+
+        String file_contents = "file1 contents";
+
+        assertEquals("HTTP/1.1 200 OK\n" +
+                 file_contents + "\n", responseMaker.buildWholeResponse(file_contents));
+    }
+
 }

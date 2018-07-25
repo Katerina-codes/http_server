@@ -23,4 +23,11 @@ public class ResponseMaker {
         return contents;
     }
 
+    public String buildWholeResponse(String fileContents) {
+        String response = "";
+        response = response + statusResponse() + "\n";
+        response = response + fileContents + "\n";
+        return response;
+    }
+
 }
