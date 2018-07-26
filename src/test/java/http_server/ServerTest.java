@@ -45,7 +45,7 @@ public class ServerTest {
     }
 
     @Test
-    public void createsInputSteam() {
+    public void createsInputStream() {
         serverSpy.run(serverSocketSpy);
 
         assertTrue(clientSocketSpy.getInputStreamWasCalled);
