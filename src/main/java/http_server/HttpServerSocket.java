@@ -2,19 +2,19 @@ package http_server;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.util.List;
 
 public class HttpServerSocket implements ServerSocketManager {
 
-    private final int port;
+    private final ServerSocket socketManager;
 
-    public HttpServerSocket(int port) {
-        this.port = port;
+    public HttpServerSocket(ServerSocket socketManager) {
+        this.socketManager = socketManager;
     }
 
     public ClientSocket accept() {
         HttpSocket httpSocket = null;
         try {
-            ServerSocket socketManager = new ServerSocket(port);
             httpSocket = new HttpSocket(socketManager.accept());
         } catch (IOException e) {
             e.printStackTrace();

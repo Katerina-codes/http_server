@@ -6,10 +6,6 @@ import java.nio.file.Paths;
 
 public class ResponseMaker {
 
-    public String statusResponse() {
-        return "HTTP/1.1 200 OK";
-    }
-
     public String returnFileContents(String file) {
         byte[] encodedContents;
         String contents = null;
@@ -27,8 +23,12 @@ public class ResponseMaker {
         String response = "";
 
         response = response + statusResponse() + "\n\n";
-        response = response + fileContents + "\n";
+        response = response + fileContents;
         return response;
+    }
+
+    public String statusResponse() {
+        return "HTTP/1.1 200 OK";
     }
 
 }

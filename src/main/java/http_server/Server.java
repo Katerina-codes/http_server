@@ -15,26 +15,30 @@ public class Server {
     }
 
     public void run(ServerSocketManager socketManager) {
-        boolean serverRunning = true;
-        while (serverRunning) {
+        while (isServerRunning()) {
             ClientSocket clientSocket = socketManager.accept();
             String request = readFromSocketStream(clientSocket);
             String fileRequested = requestParser.parse(request);
             String fileContents = responseMaker.returnFileContents(fileRequested);
             String response = responseMaker.buildWholeResponse(fileContents);
             writeResponseToRequest(clientSocket, response);
-            serverRunning = false;
+            clientSocket.close();
         }
     }
 
-    private void writeResponseToRequest(ClientSocket clientSocket, String response) {
+    private boolean isServerRunning() {
+        return true;
+    }
+
+    public void writeResponseToRequest(ClientSocket clientSocket, String response) {
         OutputStream output = clientSocket.getOutputStream();
         PrintWriter writer = new PrintWriter(output);
         writer.print(response);
         writer.flush();
+        writer.close();
     }
 
-    private String readFromSocketStream(ClientSocket clientSocket) {
+    public String readFromSocketStream(ClientSocket clientSocket) {
         InputStream request = clientSocket.getInputStream();
         InputStreamReader requestReader = new InputStreamReader(request);
         BufferedReader lineReader = new BufferedReader(requestReader);

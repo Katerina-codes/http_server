@@ -29,4 +29,12 @@ public class HttpSocket implements ClientSocket {
         }
         return output;
     }
+
+    public void close() {
+        try {
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }
