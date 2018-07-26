@@ -10,7 +10,7 @@ public class ResponseMakerTest {
     public void statusOkResponse(){
         ResponseMaker responseMaker = new ResponseMaker();
 
-        assertEquals("HTTP/1.1 200 OK", responseMaker.statusResponse());
+        assertEquals("HTTP/1.1 200 OK", responseMaker.statusResponse("file1"));
     }
 
     @Test
@@ -34,7 +34,13 @@ public class ResponseMakerTest {
         String file_contents = "file1 contents";
 
         assertEquals("HTTP/1.1 200 OK\n\n" +
-                 file_contents, responseMaker.buildWholeResponse(file_contents));
+                 file_contents, responseMaker.buildWholeResponse(file_contents, "file1"));
     }
 
+    @Test
+    public void returnStatusFourOhFourIfFileIsNotFound() {
+        ResponseMaker responseMaker = new ResponseMaker();
+
+        assertEquals("HTTP/1.1 404 Not Found", responseMaker.statusResponse("/no_file_here.txt"));
+    }
 }

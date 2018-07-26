@@ -20,7 +20,7 @@ public class Server {
             String request = readFromSocketStream(clientSocket);
             String fileRequested = requestParser.parse(request);
             String fileContents = responseMaker.returnFileContents(fileRequested);
-            String response = responseMaker.buildWholeResponse(fileContents);
+            String response = responseMaker.buildWholeResponse(fileContents, fileRequested);
             writeResponseToRequest(clientSocket, response);
             clientSocket.close();
         }

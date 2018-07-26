@@ -19,16 +19,18 @@ public class ResponseMaker {
         return contents;
     }
 
-    public String buildWholeResponse(String fileContents) {
+    public String buildWholeResponse(String fileContents, String file) {
         String response = "";
-
-        response = response + statusResponse() + "\n\n";
+        response = response + statusResponse(file) + "\n\n";
         response = response + fileContents;
         return response;
     }
 
-    public String statusResponse() {
-        return "HTTP/1.1 200 OK";
+    public String statusResponse(String file) {
+        if (returnFileContents(file) == null) {
+            return "HTTP/1.1 404 Not Found";
+        } else {
+            return "HTTP/1.1 200 OK";
+        }
     }
-
 }
