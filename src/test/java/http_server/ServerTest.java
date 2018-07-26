@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.*;
+import java.net.Socket;
 
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
@@ -78,7 +79,7 @@ public class ServerTest {
         server.run(serverSocketSpy);
 
         assertEquals("HTTP/1.1 200 OK\n\n" +
-                "file1 contents\n", clientSocketSpy.getOutputStreamContents());
+                "file1 contents", clientSocketSpy.getOutputStreamContents());
     }
 
 }

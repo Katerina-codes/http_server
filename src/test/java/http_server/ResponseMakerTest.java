@@ -34,7 +34,7 @@ public class ResponseMakerTest {
         String file_contents = "file1 contents";
 
         assertEquals("HTTP/1.1 200 OK\n\n" +
-                 file_contents + "\n", responseMaker.buildWholeResponse(file_contents));
+                 file_contents, responseMaker.buildWholeResponse(file_contents));
     }
 
 }
