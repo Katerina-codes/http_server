@@ -26,4 +26,13 @@ public class RequestParserTest {
         assertEquals("file2", requestParser.parse(request));
     }
 
+    @Test
+    public void parseMethod() {
+        RequestParser requestParser = new RequestParser();
+
+        String request = "HEAD / HTTP/1.1";
+
+        assertEquals("HEAD", requestParser.extractMethodFromRequest(request));
+    }
+
 }
