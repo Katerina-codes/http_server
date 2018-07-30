@@ -21,10 +21,10 @@ public class ResponseMakerTest {
     }
 
     @Test
-    public void returnsNullIfFileDoesNotExist() {
+    public void returnsErrorMessageIfFileDoesNotExist() {
         ResponseMaker responseMaker = new ResponseMaker();
 
-        assertEquals(null, responseMaker.returnFileContents("file20"));
+        assertEquals("This file does not exist!", responseMaker.returnFileContents("file20"));
     }
 
     @Test
@@ -34,7 +34,7 @@ public class ResponseMakerTest {
         String file_contents = "file1 contents";
 
         assertEquals("HTTP/1.1 200 OK\n\n" +
-                 file_contents, responseMaker.buildWholeResponse(file_contents, "file1"));
+                 file_contents, responseMaker.buildWholeResponse(file_contents, "file1", "GET"));
     }
 
     @Test
@@ -43,4 +43,20 @@ public class ResponseMakerTest {
 
         assertEquals("HTTP/1.1 404 Not Found", responseMaker.statusResponse("/no_file_here.txt"));
     }
+
+    @Test
+    public void returnStatusOfOkIfResourceExistsButIsEmpty() {
+        ResponseMaker responseMaker = new ResponseMaker();
+
+        assertEquals("HTTP/1.1 200 OK", responseMaker.statusResponse("/"));
+    }
+
+    @Test
+    public void headRequestReturnsNoMessageBody() {
+        ResponseMaker responseMaker = new ResponseMaker();
+
+        assertEquals("HTTP/1.1 200 OK\n" +
+                "Content-Length: 0\n\n", responseMaker.buildWholeResponse("Directory requested. Directory exists but is empty", "/", "HEAD"));
+    }
+
 }

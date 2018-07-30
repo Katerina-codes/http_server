@@ -21,7 +21,7 @@ public class ServerSpy extends Server {
             String request = readFromSocketStream(clientSocket);
             String fileRequested = requestParser.parse(request);
             String fileContents = responseMaker.returnFileContents(fileRequested);
-            String response = responseMaker.buildWholeResponse(fileContents, fileRequested);
+            String response = responseMaker.buildWholeResponse(fileContents, fileRequested, "GET");
             writeResponseToRequest(clientSocket, response);
             clientSocket.close();
         }
