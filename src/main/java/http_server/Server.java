@@ -2,7 +2,7 @@ package http_server;
 
 import java.io.*;
 
-import static http_server.StatusCodes.REQUEST_SUCCEEDED;
+import static http_server.StatusCodes.OK;
 
 public class Server {
 
@@ -26,7 +26,7 @@ public class Server {
             String resourceRequested = requestParser.parse(request);
             String statusCode = responseMaker.checkIfResourceIsAvailable(resourceRequested);
             String typeOfRequest = requestParser.extractMethodFromRequest(request);
-            if (statusCode.equals(REQUEST_SUCCEEDED.getStatusCode())) {
+            if (statusCode.equals(OK.getStatusCode())) {
                 resourceContents = responseMaker.returnResourceContents(resourceRequested);
                 response = responseMaker.buildWholeResponse(resourceContents, resourceRequested, typeOfRequest);
             } else {

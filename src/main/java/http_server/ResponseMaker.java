@@ -4,20 +4,34 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import static http_server.StatusCodes.DIRECTORY_WITH_NO_CONTENT;
-import static http_server.StatusCodes.FILE_NOT_FOUND;
-import static http_server.StatusCodes.REQUEST_SUCCEEDED;
+import static http_server.StatusCodes.NO_CONTENT;
+import static http_server.StatusCodes.NOT_FOUND;
+import static http_server.StatusCodes.OK;
 
 public class ResponseMaker {
 
+    public String statusResponse(String file) {
+        String statusCode = checkIfResourceIsAvailable(file);
+
+        if (statusCode.equals(OK.getStatusCode())) {
+            return buildStatusLine(OK);
+        } else if (statusCode.equals(NOT_FOUND.getStatusCode())) {
+            return buildStatusLine(NOT_FOUND);
+        } else if (statusCode.equals(NO_CONTENT.getStatusCode())) {
+            return buildStatusLine(NO_CONTENT);
+        } else {
+            return "Unhandled file type";
+        }
+    }
+
     public String checkIfResourceIsAvailable(String resource) {
         if (requestIsToHomePage(resource)) {
-            return REQUEST_SUCCEEDED.getStatusCode();
+            return OK.getStatusCode();
         } else {
             if (returnResourceContents(resource) != null) {
-                return REQUEST_SUCCEEDED.getStatusCode();
+                return OK.getStatusCode();
             } else {
-                return FILE_NOT_FOUND.getStatusCode();
+                return NOT_FOUND.getStatusCode();
             }
         }
     }
@@ -66,19 +80,6 @@ public class ResponseMaker {
 
     private boolean isHeadRequest(String typeOfRequest) {
         return typeOfRequest.equals("HEAD");
-    }
-
-    public String statusResponse(String file) {
-        String fileContents = checkIfResourceIsAvailable(file);
-        if (fileContents.equals(REQUEST_SUCCEEDED.getStatusCode())) {
-            return buildStatusLine(REQUEST_SUCCEEDED);
-        } else if (fileContents.equals(FILE_NOT_FOUND.getStatusCode())) {
-            return buildStatusLine(FILE_NOT_FOUND);
-        } else if (fileContents.equals(DIRECTORY_WITH_NO_CONTENT.getStatusCode())) {
-            return buildStatusLine(DIRECTORY_WITH_NO_CONTENT);
-        } else {
-            return "Unhandled file type";
-        }
     }
 
     private String buildStatusLine(StatusCodes statusCode) {

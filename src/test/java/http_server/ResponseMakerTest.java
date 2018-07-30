@@ -20,9 +20,9 @@ public class ResponseMakerTest {
 
         assertEquals(buildResponse(
                 responseStart,
-                REQUEST_SUCCEEDED.getStatusCode(),
+                OK.getStatusCode(),
                 space,
-                REQUEST_SUCCEEDED.getStatusMessage()),
+                OK.getStatusMessage()),
 
                 responseMaker.statusResponse("file1"));
     }
@@ -35,22 +35,15 @@ public class ResponseMakerTest {
     }
 
     @Test
-    public void returnsErrorMessageIfFileDoesNotExist() {
-        ResponseMaker responseMaker = new ResponseMaker();
-
-        assertEquals(FILE_NOT_FOUND.getStatusCode(), responseMaker.checkIfResourceIsAvailable("file20"));
-    }
-
-    @Test
     public void buildsWholeResponse() {
         ResponseMaker responseMaker = new ResponseMaker();
         String response = responseMaker.buildWholeResponse("file1 contents", "file1", "GET");
 
         assertEquals(buildResponse(
                 responseStart,
-                REQUEST_SUCCEEDED.getStatusCode(),
+                OK.getStatusCode(),
                 space,
-                REQUEST_SUCCEEDED.getStatusMessage())
+                OK.getStatusMessage())
                         + "\n\n" +
                         "file1 contents",
 
@@ -62,11 +55,10 @@ public class ResponseMakerTest {
         ResponseMaker responseMaker = new ResponseMaker();
 
         assertEquals(buildResponse(
-
                 responseStart,
-                FILE_NOT_FOUND.getStatusCode(),
+                NOT_FOUND.getStatusCode(),
                 space,
-                FILE_NOT_FOUND.getStatusMessage()),
+                NOT_FOUND.getStatusMessage()),
 
                 responseMaker.statusResponse("/no_file_here.txt"));
     }
@@ -77,9 +69,9 @@ public class ResponseMakerTest {
 
         assertEquals(buildResponse(
                 responseStart,
-                REQUEST_SUCCEEDED.getStatusCode(),
+                OK.getStatusCode(),
                 space,
-                REQUEST_SUCCEEDED.getStatusMessage()),
+                OK.getStatusMessage()),
 
                 responseMaker.statusResponse("/"));
     }
@@ -90,9 +82,9 @@ public class ResponseMakerTest {
 
         assertEquals(buildResponse(
                 responseStart,
-                REQUEST_SUCCEEDED.getStatusCode(),
+                OK.getStatusCode(),
                 space,
-                REQUEST_SUCCEEDED.getStatusMessage()) +
+                OK.getStatusMessage()) +
                         "\n" +
                         "Content-Length: 0\n\n",
 
