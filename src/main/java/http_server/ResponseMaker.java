@@ -71,14 +71,18 @@ public class ResponseMaker {
     public String statusResponse(String file) {
         String fileContents = checkIfResourceIsAvailable(file);
         if (fileContents.equals(REQUEST_SUCCEEDED.getStatusCode())) {
-            return "HTTP/1.1 " + REQUEST_SUCCEEDED.getStatusCode() + " " + REQUEST_SUCCEEDED.getStatusMessage();
+            return buildStatusLine(REQUEST_SUCCEEDED);
         } else if (fileContents.equals(FILE_NOT_FOUND.getStatusCode())) {
-            return "HTTP/1.1 " + FILE_NOT_FOUND.getStatusCode() + " " + FILE_NOT_FOUND.getStatusMessage();
+            return buildStatusLine(FILE_NOT_FOUND);
         } else if (fileContents.equals(DIRECTORY_WITH_NO_CONTENT.getStatusCode())) {
-            return "HTTP/1.1 " + DIRECTORY_WITH_NO_CONTENT.getStatusCode() + " " + DIRECTORY_WITH_NO_CONTENT.getStatusMessage();
+            return buildStatusLine(DIRECTORY_WITH_NO_CONTENT);
         } else {
             return "Unhandled file type";
         }
+    }
+
+    private String buildStatusLine(StatusCodes statusCode) {
+        return "HTTP/1.1 " + statusCode.getStatusCode() + " " + statusCode.getStatusMessage();
     }
 
 }
