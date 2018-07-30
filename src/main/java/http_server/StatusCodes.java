@@ -2,20 +2,24 @@ package http_server;
 
 public enum StatusCodes {
 
-    DIRECTORY_WITH_NO_CONTENT(204, "Resource exists but is empty"),
-    FILE_NOT_FOUND(404, "This file has not been found"),
-    REQUEST_HAS_SUCCEEDED(200, "HTTP/1.1 200 OK");
+    DIRECTORY_WITH_NO_CONTENT("204", "No Content"),
+    FILE_NOT_FOUND("404", "Not Found"),
+    REQUEST_SUCCEEDED("200", "OK");
 
-    private final int statusCode;
-    private final String message;
+    private final String statusCode;
+    private final String statusMessage;
 
-    StatusCodes(int statusCode, String message) {
+    StatusCodes(String statusCode, String statusMessage) {
         this.statusCode = statusCode;
-        this.message = message;
+        this.statusMessage = statusMessage;
     }
 
-    public String getMessage() {
-        return message;
+    public String getStatusCode() {
+        return statusCode;
+    }
+
+    public String getStatusMessage() {
+        return statusMessage;
     }
 
 }

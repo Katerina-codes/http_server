@@ -2,6 +2,8 @@ package http_server;
 
 import java.io.*;
 
+import static http_server.StatusCodes.REQUEST_SUCCEEDED;
+
 public class Server {
 
     public String host;
@@ -15,12 +17,21 @@ public class Server {
     }
 
     public void run(ServerSocketManager socketManager) {
+        String response = "";
+        String resourceContents = "";
+
         while (isServerRunning()) {
             ClientSocket clientSocket = socketManager.accept();
             String request = readFromSocketStream(clientSocket);
-            String fileRequested = requestParser.parse(request);
-            String fileContents = responseMaker.returnFileContents(fileRequested);
-            String response = responseMaker.buildWholeResponse(fileContents, fileRequested, "GET");
+            String resourceRequested = requestParser.parse(request);
+            String statusCode = responseMaker.checkIfResourceIsAvailable(resourceRequested);
+            String typeOfRequest = requestParser.extractMethodFromRequest(request);
+            if (statusCode.equals(REQUEST_SUCCEEDED.getStatusCode())) {
+                resourceContents = responseMaker.returnResourceContents(resourceRequested);
+                response = responseMaker.buildWholeResponse(resourceContents, resourceRequested, typeOfRequest);
+            } else {
+                response = responseMaker.buildWholeResponse(resourceContents, resourceRequested, typeOfRequest);
+            }
             writeResponseToRequest(clientSocket, response);
             clientSocket.close();
         }
