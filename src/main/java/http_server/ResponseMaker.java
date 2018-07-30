@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import static http_server.StatusCodes.DIRECTORY_WITH_NO_CONTENT;
+import static http_server.StatusCodes.FILE_NOT_FOUND;
+
 public class ResponseMaker {
 
     public String returnFileContents(String resource) {
@@ -11,7 +14,7 @@ public class ResponseMaker {
         String contents;
 
         if (resource.equals("/")) {
-            return "Directory requested. Directory exists but is empty";
+            return DIRECTORY_WITH_NO_CONTENT.getMessage();
         } else {
             try {
                 String filePath = String.format("public/%s", resource);
@@ -19,7 +22,7 @@ public class ResponseMaker {
                 contents = new String(encodedContents, "US-ASCII");
             } catch (IOException e) {
                 e.printStackTrace();
-                contents = "This file does not exist!";
+                contents = FILE_NOT_FOUND.getMessage();
             }
             return contents;
         }
@@ -51,7 +54,7 @@ public class ResponseMaker {
     }
 
     private String handleEmplyFile(String fileContents) {
-        if (fileContents.equals("This file does not exist!") || fileContents.equals("Directory requested. Directory exists but is empty")) {
+        if (fileContents.equals(FILE_NOT_FOUND.getMessage()) || fileContents.equals(DIRECTORY_WITH_NO_CONTENT.getMessage())) {
             fileContents = "";
         }
         return fileContents;
@@ -59,9 +62,9 @@ public class ResponseMaker {
 
     public String statusResponse(String file) {
         String fileContents = returnFileContents(file);
-        if (fileContents.equals("This file does not exist!")) {
+        if (fileContents.equals(FILE_NOT_FOUND.getMessage())) {
             return "HTTP/1.1 404 Not Found";
-        } else if (fileContents.equals("Directory requested. Directory exists but is empty") || fileContents.length() > 0) {
+        } else if (fileContents.equals(DIRECTORY_WITH_NO_CONTENT.getMessage()) || fileContents.length() > 0) {
             return "HTTP/1.1 200 OK";
         } else {
             return "Unhandled file type";

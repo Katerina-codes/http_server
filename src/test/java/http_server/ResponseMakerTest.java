@@ -2,6 +2,9 @@ package http_server;
 
 import org.junit.Test;
 
+import static http_server.StatusCodes.DIRECTORY_WITH_NO_CONTENT;
+import static http_server.StatusCodes.FILE_NOT_FOUND;
+import static http_server.StatusCodes.REQUEST_HAS_SUCCEEDED;
 import static org.junit.Assert.assertEquals;
 
 public class ResponseMakerTest {
@@ -10,7 +13,7 @@ public class ResponseMakerTest {
     public void statusOkResponse(){
         ResponseMaker responseMaker = new ResponseMaker();
 
-        assertEquals("HTTP/1.1 200 OK", responseMaker.statusResponse("file1"));
+        assertEquals(REQUEST_HAS_SUCCEEDED.getMessage(), responseMaker.statusResponse("file1"));
     }
 
     @Test
@@ -24,7 +27,7 @@ public class ResponseMakerTest {
     public void returnsErrorMessageIfFileDoesNotExist() {
         ResponseMaker responseMaker = new ResponseMaker();
 
-        assertEquals("This file does not exist!", responseMaker.returnFileContents("file20"));
+        assertEquals(FILE_NOT_FOUND.getMessage(), responseMaker.returnFileContents("file20"));
     }
 
     @Test
@@ -33,7 +36,7 @@ public class ResponseMakerTest {
 
         String file_contents = "file1 contents";
 
-        assertEquals("HTTP/1.1 200 OK\n\n" +
+        assertEquals(REQUEST_HAS_SUCCEEDED.getMessage() + "\n\n" +
                  file_contents, responseMaker.buildWholeResponse(file_contents, "file1", "GET"));
     }
 
@@ -48,15 +51,15 @@ public class ResponseMakerTest {
     public void returnStatusOfOkIfResourceExistsButIsEmpty() {
         ResponseMaker responseMaker = new ResponseMaker();
 
-        assertEquals("HTTP/1.1 200 OK", responseMaker.statusResponse("/"));
+        assertEquals(REQUEST_HAS_SUCCEEDED.getMessage(), responseMaker.statusResponse("/"));
     }
 
     @Test
     public void headRequestReturnsNoMessageBody() {
         ResponseMaker responseMaker = new ResponseMaker();
 
-        assertEquals("HTTP/1.1 200 OK\n" +
-                "Content-Length: 0\n\n", responseMaker.buildWholeResponse("Directory requested. Directory exists but is empty", "/", "HEAD"));
+        assertEquals(REQUEST_HAS_SUCCEEDED.getMessage() + "\n" +
+                "Content-Length: 0\n\n", responseMaker.buildWholeResponse(DIRECTORY_WITH_NO_CONTENT.getMessage(), "/", "HEAD"));
     }
 
 }
