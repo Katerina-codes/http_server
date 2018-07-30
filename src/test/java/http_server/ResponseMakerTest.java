@@ -2,15 +2,13 @@ package http_server;
 
 import org.junit.Test;
 
-import static http_server.StatusCodes.DIRECTORY_WITH_NO_CONTENT;
-import static http_server.StatusCodes.FILE_NOT_FOUND;
-import static http_server.StatusCodes.REQUEST_HAS_SUCCEEDED;
+import static http_server.StatusCodes.*;
 import static org.junit.Assert.assertEquals;
 
 public class ResponseMakerTest {
 
     @Test
-    public void statusOkResponse(){
+    public void statusOkResponse() {
         ResponseMaker responseMaker = new ResponseMaker();
 
         assertEquals(REQUEST_HAS_SUCCEEDED.getMessage(), responseMaker.statusResponse("file1"));
@@ -37,7 +35,7 @@ public class ResponseMakerTest {
         String file_contents = "file1 contents";
 
         assertEquals(REQUEST_HAS_SUCCEEDED.getMessage() + "\n\n" +
-                 file_contents, responseMaker.buildWholeResponse(file_contents, "file1", "GET"));
+                file_contents, responseMaker.buildWholeResponse(file_contents, "file1", "GET"));
     }
 
     @Test

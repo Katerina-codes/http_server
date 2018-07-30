@@ -9,4 +9,5 @@ public class RequestParser {
     public String extractMethodFromRequest(String request) {
         return request.substring(0, request.lastIndexOf(" /"));
     }
+
 }

@@ -2,7 +2,6 @@ package http_server;
 
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.util.List;
 
 public class HttpServerSocket implements ServerSocketManager {
 
@@ -21,4 +20,5 @@ public class HttpServerSocket implements ServerSocketManager {
         }
         return httpSocket;
     }
+
 }

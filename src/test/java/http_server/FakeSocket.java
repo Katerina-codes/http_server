@@ -23,4 +23,5 @@ public class FakeSocket extends Socket {
     public OutputStream getOutputStream() {
         return outputStream;
     }
+
 }

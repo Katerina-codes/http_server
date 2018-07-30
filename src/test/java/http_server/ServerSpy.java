@@ -30,4 +30,5 @@ public class ServerSpy extends Server {
     public boolean isServerRunning() {
         return possibleOptions.remove(0);
     }
+
 }
