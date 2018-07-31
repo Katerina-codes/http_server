@@ -76,7 +76,9 @@ public class ServerTest {
 
         serverSpy.run(serverSocketSpy);
 
-        assertEquals("HTTP/1.1 200 OK\n\n" +
+        assertEquals("HTTP/1.1 200 OK\n" +
+                "Connection: close\n" +
+                "Content-Type: text/plain" + "\n\n" +
                 "file1 contents", clientSocketSpy.getOutputStreamContents());
     }
 

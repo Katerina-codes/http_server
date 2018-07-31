@@ -37,15 +37,16 @@ public class ResponseMakerTest {
     @Test
     public void buildsWholeResponse() {
         ResponseMaker responseMaker = new ResponseMaker();
-        String response = responseMaker.buildWholeResponse("file1 contents", "file1", "GET");
+        String response = responseMaker.buildWholeResponse("GET /file1 HTTP/1.0");
 
         assertEquals(buildResponse(
                 responseStart,
                 OK.getStatusCode(),
                 space,
-                OK.getStatusMessage())
-                        + "\n\n" +
-                        "file1 contents",
+                OK.getStatusMessage()) + "\n" +
+                        "Connection: close\n" +
+                        "Content-Type: text/plain" + "\n\n" +
+                "file1 contents",
 
                 response);
     }
@@ -85,10 +86,25 @@ public class ResponseMakerTest {
                 OK.getStatusCode(),
                 space,
                 OK.getStatusMessage()) +
-                        "\n" +
-                        "Content-Length: 0\n\n",
+                        "\n\n",
 
-                responseMaker.buildWholeResponse("", "/", "HEAD"));
+                responseMaker.buildWholeResponse("HEAD / HTTP/1.1"));
+    }
+
+    @Test
+    public void returnsCorrectContentTypeForJpeg() {
+        ResponseMaker responseMaker = new ResponseMaker();
+
+        String fileExtension = "jpeg";
+        assertEquals("image/jpeg", responseMaker.returnContentType(fileExtension));
+    }
+
+    @Test
+    public void returnsCorrectContentTypeForTxt() {
+        ResponseMaker responseMaker = new ResponseMaker();
+
+        String fileExtension = "txt";
+        assertEquals("text/plain", responseMaker.returnContentType(fileExtension));
     }
 
 }

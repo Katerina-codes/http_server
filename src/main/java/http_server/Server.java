@@ -2,13 +2,10 @@ package http_server;
 
 import java.io.*;
 
-import static http_server.StatusCodes.OK;
-
 public class Server {
 
     public String host;
     public int port;
-    private RequestParser requestParser = new RequestParser();
     private ResponseMaker responseMaker = new ResponseMaker();
 
     public Server(String host, int port) {
@@ -17,21 +14,12 @@ public class Server {
     }
 
     public void run(ServerSocketManager socketManager) {
-        String response = "";
-        String resourceContents = "";
+        String response;
 
         while (isServerRunning()) {
             ClientSocket clientSocket = socketManager.accept();
             String request = readFromSocketStream(clientSocket);
-            String resourceRequested = requestParser.parse(request);
-            String statusCode = responseMaker.checkIfResourceIsAvailable(resourceRequested);
-            String typeOfRequest = requestParser.extractMethodFromRequest(request);
-            if (statusCode.equals(OK.getStatusCode())) {
-                resourceContents = responseMaker.returnResourceContents(resourceRequested);
-                response = responseMaker.buildWholeResponse(resourceContents, resourceRequested, typeOfRequest);
-            } else {
-                response = responseMaker.buildWholeResponse(resourceContents, resourceRequested, typeOfRequest);
-            }
+            response = responseMaker.buildWholeResponse(request);
             writeResponseToRequest(clientSocket, response);
             clientSocket.close();
         }

@@ -10,6 +10,8 @@ import static http_server.StatusCodes.OK;
 
 public class ResponseMaker {
 
+    private RequestParser requestParser = new RequestParser();
+
     public String statusResponse(String file) {
         String statusCode = checkIfResourceIsAvailable(file);
         if (statusCode.equals(OK.getStatusCode())) {
@@ -57,24 +59,28 @@ public class ResponseMaker {
         }
     }
 
-    public String buildWholeResponse(String resourceContents, String resource, String typeOfRequest) {
-        String response = "";
+    public String buildWholeResponse(String request) {
+        String typeOfRequest = requestParser.extractMethodFromRequest(request);
+        String resourceRequested = requestParser.parse(request);
         if (isHeadRequest(typeOfRequest)) {
-            return returnNoMessageBody(resourceContents, resource, response);
+            return returnNoMessageBody(resourceRequested);
         } else {
-            return returnMessageBody(resourceContents, resource, response);
+            return returnMessageBody(request, resourceRequested);
         }
     }
 
-    private String returnMessageBody(String fileContents, String file, String response) {
-        response = response + statusResponse(file) + "\n\n";
+    private String returnMessageBody(String request, String resourceRequested) {
+        String fileContents = returnResourceContents(resourceRequested);
+        String response = "" + statusResponse(resourceRequested) + "\n" +
+                "Connection: close\n" +
+                "Content-Type: text/plain\n\n";
         return response + fileContents;
     }
 
-    private String returnNoMessageBody(String fileContents, String file, String response) {
-        response = response + statusResponse(file) + "\n";
-        String formatString = String.format("Content-Length: %s\n", fileContents.length());
-        return response + formatString + "\n";
+    private String returnNoMessageBody(String resourceRequested) {
+        String fileContents = "";
+        String response = fileContents + statusResponse(resourceRequested) + "\n";
+        return response + "\n";
     }
 
     private boolean isHeadRequest(String typeOfRequest) {
@@ -83,6 +89,14 @@ public class ResponseMaker {
 
     private String buildStatusLine(StatusCodes statusCode) {
         return "HTTP/1.1 " + statusCode.getStatusCode() + " " + statusCode.getStatusMessage();
+    }
+
+    public String returnContentType(String fileExtension) {
+        if (fileExtension.equals("txt")) {
+            return "text/plain";
+        } else {
+            return "image/jpeg";
+        }
     }
 
 }
