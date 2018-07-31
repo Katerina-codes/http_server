@@ -12,7 +12,6 @@ public class ResponseMaker {
 
     public String statusResponse(String file) {
         String statusCode = checkIfResourceIsAvailable(file);
-
         if (statusCode.equals(OK.getStatusCode())) {
             return buildStatusLine(OK);
         } else if (statusCode.equals(NOT_FOUND.getStatusCode())) {

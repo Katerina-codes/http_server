@@ -1,10 +1,12 @@
 package http_server;
 
+import java.util.HashMap;
+
 public enum StatusCodes {
 
+    OK("200", "OK"),
     NO_CONTENT("204", "No Content"),
-    NOT_FOUND("404", "Not Found"),
-    OK("200", "OK");
+    NOT_FOUND("404", "Not Found");
 
     private final String statusCode;
     private final String statusMessage;
