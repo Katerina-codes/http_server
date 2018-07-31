@@ -67,12 +67,15 @@ public class ResponseMaker {
     }
 
     public String returnContentType(String fileExtension) {
-        if (fileExtension.equals("txt")) {
-            return "text/plain";
-        } else if (fileExtension.equals("jpeg")) {
-            return "image/jpeg";
-        } else {
-           return "image/png";
+        switch (fileExtension) {
+            case "txt":
+                return "text/plain";
+            case "jpeg":
+                return "image/jpeg";
+            case "png":
+                return "image/png";
+            default:
+                return "image/gif";
         }
     }
 

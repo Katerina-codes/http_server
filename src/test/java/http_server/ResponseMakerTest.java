@@ -115,4 +115,12 @@ public class ResponseMakerTest {
         assertEquals("image/png", responseMaker.returnContentType(fileExtension));
     }
 
+    @Test
+    public void returnsCorrectContentTypeForGif() {
+        ResponseMaker responseMaker = new ResponseMaker();
+
+        String fileExtension = "gif";
+        assertEquals("image/gif", responseMaker.returnContentType(fileExtension));
+    }
+
 }
