@@ -25,18 +25,6 @@ public class ResponseMaker {
         }
     }
 
-    public String checkIfResourceIsAvailable(String resource) {
-        if (requestIsToHomePage(resource)) {
-            return OK.getStatusCode();
-        } else {
-            if (returnResourceContents(resource) != null) {
-                return OK.getStatusCode();
-            } else {
-                return NOT_FOUND.getStatusCode();
-            }
-        }
-    }
-
     private boolean requestIsToHomePage(String resource) {
         return resource.equals("/");
     }
@@ -61,7 +49,7 @@ public class ResponseMaker {
 
     public String buildWholeResponse(String request) {
         String typeOfRequest = requestParser.extractMethodFromRequest(request);
-        String resourceRequested = requestParser.parse(request);
+        String resourceRequested = requestParser.parseResource(request);
         if (isHeadRequest(typeOfRequest)) {
             return returnNoMessageBody(resourceRequested);
         } else {
@@ -71,24 +59,11 @@ public class ResponseMaker {
 
     private String returnMessageBody(String request, String resourceRequested) {
         String fileContents = returnResourceContents(resourceRequested);
+        String contentType = returnContentType(requestParser.parseContentType(resourceRequested));
         String response = "" + statusResponse(resourceRequested) + "\n" +
                 "Connection: close\n" +
-                "Content-Type: text/plain\n\n";
+                String.format("Content-Type: %s\n\n", contentType);
         return response + fileContents;
-    }
-
-    private String returnNoMessageBody(String resourceRequested) {
-        String fileContents = "";
-        String response = fileContents + statusResponse(resourceRequested) + "\n";
-        return response + "\n";
-    }
-
-    private boolean isHeadRequest(String typeOfRequest) {
-        return typeOfRequest.equals("HEAD");
-    }
-
-    private String buildStatusLine(StatusCodes statusCode) {
-        return "HTTP/1.1 " + statusCode.getStatusCode() + " " + statusCode.getStatusMessage();
     }
 
     public String returnContentType(String fileExtension) {
@@ -97,6 +72,32 @@ public class ResponseMaker {
         } else {
             return "image/jpeg";
         }
+    }
+
+    private String returnNoMessageBody(String resourceRequested) {
+        String fileContents = "";
+        String response = fileContents + statusResponse(resourceRequested) + "\n";
+        return response + "\n";
+    }
+
+    private String checkIfResourceIsAvailable(String resource) {
+        if (requestIsToHomePage(resource)) {
+            return OK.getStatusCode();
+        } else {
+            if (returnResourceContents(resource) != null) {
+                return OK.getStatusCode();
+            } else {
+                return NOT_FOUND.getStatusCode();
+            }
+        }
+    }
+
+    private boolean isHeadRequest(String typeOfRequest) {
+        return typeOfRequest.equals("HEAD");
+    }
+
+    private String buildStatusLine(StatusCodes statusCode) {
+        return "HTTP/1.1 " + statusCode.getStatusCode() + " " + statusCode.getStatusMessage();
     }
 
 }

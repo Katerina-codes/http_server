@@ -1,7 +1,5 @@
 package http_server;
 
-import java.util.HashMap;
-
 public enum StatusCodes {
 
     OK("200", "OK"),

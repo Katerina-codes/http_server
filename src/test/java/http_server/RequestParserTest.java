@@ -11,9 +11,9 @@ public class RequestParserTest {
         RequestParser requestParser = new RequestParser();
 
         String request = "GET /file1 HTTP/1.1";
-        requestParser.parse(request);
+        requestParser.parseResource(request);
 
-        assertEquals("file1", requestParser.parse(request));
+        assertEquals("file1", requestParser.parseResource(request));
     }
 
     @Test
@@ -21,9 +21,9 @@ public class RequestParserTest {
         RequestParser requestParser = new RequestParser();
 
         String request = "GET /file2 HTTP/1.1";
-        requestParser.parse(request);
+        requestParser.parseResource(request);
 
-        assertEquals("file2", requestParser.parse(request));
+        assertEquals("file2", requestParser.parseResource(request));
     }
 
     @Test
@@ -48,9 +48,7 @@ public class RequestParserTest {
     public void parsesContentType() {
         RequestParser requestParser = new RequestParser();
 
-        String request = "GET /image.jpeg HTTP/1.1";
-
-        assertEquals("jpeg", requestParser.parseContentType(request));
+        assertEquals("jpeg", requestParser.parseContentType("image.jpeg"));
     }
 
 }

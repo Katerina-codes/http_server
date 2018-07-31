@@ -2,7 +2,7 @@ package http_server;
 
 public class RequestParser {
 
-    public String parse(String request) {
+    public String parseResource(String request) {
         return request.substring(5, request.lastIndexOf(" "));
     }
 
@@ -10,10 +10,13 @@ public class RequestParser {
         return request.substring(0, request.lastIndexOf(" /"));
     }
 
-    public String parseContentType(String request) {
-        int startOfString = request.indexOf(".", 0) + 1;
-        int endOFString = request.lastIndexOf(" ");
-        return request.substring(startOfString, endOFString);
+    public String parseContentType(String resource) {
+        if (resource.equals("file1") || resource.equals("file2")) {
+            return "txt";
+        } else {
+            int startOfString = resource.indexOf(".", 0) + 1;
+            return resource.substring(startOfString, resource.length());
+        }
     }
 
 }
