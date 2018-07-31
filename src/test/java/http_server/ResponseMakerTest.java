@@ -107,4 +107,12 @@ public class ResponseMakerTest {
         assertEquals("text/plain", responseMaker.returnContentType(fileExtension));
     }
 
+    @Test
+    public void returnsCorrectContentTypeForPng() {
+        ResponseMaker responseMaker = new ResponseMaker();
+
+        String fileExtension = "png";
+        assertEquals("image/png", responseMaker.returnContentType(fileExtension));
+    }
+
 }

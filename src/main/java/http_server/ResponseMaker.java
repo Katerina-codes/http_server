@@ -53,11 +53,11 @@ public class ResponseMaker {
         if (isHeadRequest(typeOfRequest)) {
             return returnNoMessageBody(resourceRequested);
         } else {
-            return returnMessageBody(request, resourceRequested);
+            return returnMessageBody(resourceRequested);
         }
     }
 
-    private String returnMessageBody(String request, String resourceRequested) {
+    private String returnMessageBody(String resourceRequested) {
         String fileContents = returnResourceContents(resourceRequested);
         String contentType = returnContentType(requestParser.parseContentType(resourceRequested));
         String response = "" + statusResponse(resourceRequested) + "\n" +
@@ -69,8 +69,10 @@ public class ResponseMaker {
     public String returnContentType(String fileExtension) {
         if (fileExtension.equals("txt")) {
             return "text/plain";
-        } else {
+        } else if (fileExtension.equals("jpeg")) {
             return "image/jpeg";
+        } else {
+           return "image/png";
         }
     }
 
