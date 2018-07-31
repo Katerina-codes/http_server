@@ -3,27 +3,28 @@ package http_server;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 
-import static http_server.StatusCodes.NO_CONTENT;
 import static http_server.StatusCodes.NOT_FOUND;
 import static http_server.StatusCodes.OK;
+import static java.util.Arrays.asList;
 
 public class ResponseMaker {
 
     private RequestParser requestParser = new RequestParser();
 
     public String statusResponse(String file) {
-        String statusCode = checkIfResourceIsAvailable(file);
-        if (statusCode.equals(OK.getStatusCode())) {
-            return buildStatusLine(OK);
-        } else if (statusCode.equals(NOT_FOUND.getStatusCode())) {
-            return buildStatusLine(NOT_FOUND);
-        } else if (statusCode.equals(NO_CONTENT.getStatusCode())) {
-            return buildStatusLine(NO_CONTENT);
-        } else {
-            return "Unhandled file type";
+        String statusCodeForResource = isResourceAvailable(file);
+
+        List<StatusCodes> statusCodes = asList(StatusCodes.values());
+        for (StatusCodes statusCode : statusCodes) {
+            if (statusCode.getStatusCode().equals(statusCodeForResource)) {
+                return buildStatusLine(statusCode);
+            }
         }
+        return "Unhandled file type";
     }
+
 
     private boolean requestIsToHomePage(String resource) {
         return resource.equals("/");
@@ -85,7 +86,7 @@ public class ResponseMaker {
         return response + "\n";
     }
 
-    private String checkIfResourceIsAvailable(String resource) {
+    private String isResourceAvailable(String resource) {
         if (requestIsToHomePage(resource)) {
             return OK.getStatusCode();
         } else {
