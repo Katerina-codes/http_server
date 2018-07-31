@@ -54,16 +54,22 @@ public class ResponseMaker {
         if (isHeadRequest(typeOfRequest)) {
             return returnNoMessageBody(resourceRequested);
         } else if (typeOfRequest.equals("OPTIONS")) {
-            return optionsMessageBody();
+            return optionsMessageBody(resourceRequested);
         } else {
             return returnMessageBody(resourceRequested);
         }
     }
 
-    private String optionsMessageBody() {
-        return buildStatusLine(OK) + "\n" +
-                "Connection: close\n" +
-                "Allow: GET, HEAD, OPTIONS, PUT, DELETE\n";
+    private String optionsMessageBody(String resourceRequested) {
+        String response = "" +
+                buildStatusLine(OK) + "\n" +
+                "Connection: close\n";
+
+        if (resourceRequested.equals("logs")) {
+            return response + "Allow: GET, HEAD, OPTIONS\n";
+        } else {
+            return response + "Allow: GET, HEAD, OPTIONS, PUT, DELETE\n";
+        }
     }
 
     private String returnMessageBody(String resourceRequested) {
