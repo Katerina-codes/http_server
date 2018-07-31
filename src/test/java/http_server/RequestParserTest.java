@@ -44,4 +44,13 @@ public class RequestParserTest {
         assertEquals("GET", requestParser.extractMethodFromRequest(request));
     }
 
+    @Test
+    public void parsesContentType() {
+        RequestParser requestParser = new RequestParser();
+
+        String request = "GET /image.jpeg HTTP/1.1";
+
+        assertEquals("jpeg", requestParser.parseContentType(request));
+    }
+
 }

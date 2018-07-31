@@ -10,4 +10,10 @@ public class RequestParser {
         return request.substring(0, request.lastIndexOf(" /"));
     }
 
+    public String parseContentType(String request) {
+        int startOfString = request.indexOf(".", 0) + 1;
+        int endOFString = request.lastIndexOf(" ");
+        return request.substring(startOfString, endOFString);
+    }
+
 }
