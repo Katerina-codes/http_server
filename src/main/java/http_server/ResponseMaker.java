@@ -53,9 +53,17 @@ public class ResponseMaker {
         String resourceRequested = requestParser.parseResource(request);
         if (isHeadRequest(typeOfRequest)) {
             return returnNoMessageBody(resourceRequested);
+        } else if (typeOfRequest.equals("OPTIONS")) {
+            return optionsMessageBody();
         } else {
             return returnMessageBody(resourceRequested);
         }
+    }
+
+    private String optionsMessageBody() {
+        return buildStatusLine(OK) + "\n" +
+                "Connection: close\n" +
+                "Allow: GET, HEAD, OPTIONS, PUT, DELETE\n";
     }
 
     private String returnMessageBody(String resourceRequested) {

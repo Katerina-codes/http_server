@@ -92,6 +92,21 @@ public class ResponseMakerTest {
     }
 
     @Test
+    public void responseToOptionsRequestContainsMethodsItSupports() {
+        ResponseMaker responseMaker = new ResponseMaker();
+
+       assertEquals(buildResponse(
+               responseStart,
+               OK.getStatusCode(),
+               space,
+               OK.getStatusMessage()) + "\n" +
+               "Connection: close\n" +
+               "Allow: GET, HEAD, OPTIONS, PUT, DELETE\n",
+
+               responseMaker.buildWholeResponse("OPTIONS /file1 HTTP/1.1"));
+    }
+
+    @Test
     public void returnsCorrectContentTypeForJpeg() {
         ResponseMaker responseMaker = new ResponseMaker();
 
