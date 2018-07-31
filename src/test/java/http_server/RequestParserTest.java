@@ -20,10 +20,20 @@ public class RequestParserTest {
     public void returnsAnotherFileName() {
         RequestParser requestParser = new RequestParser();
 
-        String request = "GET /file2 HTTP/1.1";
+        String request = "HEAD /image.jpeg HTTP/1.1";
         requestParser.parseResource(request);
 
-        assertEquals("file2", requestParser.parseResource(request));
+        assertEquals("image.jpeg", requestParser.parseResource(request));
+    }
+
+    @Test
+    public void returnsDirectory() {
+        RequestParser requestParser = new RequestParser();
+
+        String request = "HEAD / HTTP/1.1";
+        requestParser.parseResource(request);
+
+        assertEquals("/", requestParser.parseResource(request));
     }
 
     @Test

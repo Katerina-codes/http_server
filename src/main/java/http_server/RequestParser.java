@@ -3,7 +3,13 @@ package http_server;
 public class RequestParser {
 
     public String parseResource(String request) {
-        return request.substring(5, request.lastIndexOf(" "));
+        int startOfString = request.indexOf("/", 0) + 1;
+        String substring = request.substring(startOfString, request.lastIndexOf(" "));
+        if (substring.equals("")) {
+            return "/";
+        } else {
+            return substring;
+        }
     }
 
     public String extractMethodFromRequest(String request) {
