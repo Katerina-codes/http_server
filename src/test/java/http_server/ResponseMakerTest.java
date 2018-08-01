@@ -113,6 +113,19 @@ public class ResponseMakerTest {
     }
 
     @Test
+    public void textFileDoesNotAllowPostMethodRequest() {
+        assertEquals(buildResponse(
+                responseStart,
+                "405",
+                space,
+                "Method Not Allowed") + "\n" +
+                "Connection: close\n" +
+                "Allow: GET, HEAD, OPTIONS, PUT, DELETE\n",
+
+                responseMaker.buildWholeResponse("POST /file1 HTTP/1.1"));
+    }
+
+    @Test
     public void returnsCorrectContentTypeForJpeg() {
         String fileExtension = "jpeg";
         assertEquals("image/jpeg", responseMaker.returnContentType(fileExtension));

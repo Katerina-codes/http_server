@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
+import static http_server.StatusCodes.METHOD_NOT_ALLOWED;
 import static http_server.StatusCodes.NOT_FOUND;
 import static http_server.StatusCodes.OK;
 import static java.util.Arrays.asList;
@@ -50,6 +51,8 @@ public class ResponseMaker {
             return returnNoMessageBody(resourceRequested);
         } else if (typeOfRequest.equals("OPTIONS")) {
             return optionsMessageBody(resourceRequested);
+        } else if (typeOfRequest.equals("POST")) {
+            return postMessageBody(resourceRequested);
         } else {
             return returnMessageBody(resourceRequested);
         }
@@ -116,6 +119,18 @@ public class ResponseMaker {
             return response + "Allow: GET, HEAD, OPTIONS\n";
         } else {
             return response + "Allow: GET, HEAD, OPTIONS, PUT, DELETE\n";
+        }
+    }
+
+    private String postMessageBody(String resourceRequested) {
+        String response = "";
+        String optionsResponse = optionsMessageBody(resourceRequested);
+        if (optionsResponse.contains("POST")) {
+            return response + "POST is not supported";
+        } else {
+            return response + buildStatusLine(METHOD_NOT_ALLOWED) + "\n" +
+            "Connection: close\n" +
+            "Allow: GET, HEAD, OPTIONS, PUT, DELETE\n";
         }
     }
 

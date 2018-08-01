@@ -4,7 +4,8 @@ public enum StatusCodes {
 
     OK("200", "OK"),
     NO_CONTENT("204", "No Content"),
-    NOT_FOUND("404", "Not Found");
+    NOT_FOUND("404", "Not Found"),
+    METHOD_NOT_ALLOWED("405", "Method Not Allowed");
 
     private final String statusCode;
     private final String statusMessage;
