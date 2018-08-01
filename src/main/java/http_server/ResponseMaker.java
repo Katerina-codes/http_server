@@ -3,6 +3,7 @@ package http_server;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 
 import static http_server.StatusCodes.METHOD_NOT_ALLOWED;
@@ -47,14 +48,19 @@ public class ResponseMaker {
     public String buildWholeResponse(String request) {
         String typeOfRequest = requestParser.extractMethodFromRequest(request);
         String resourceRequested = requestParser.parseResource(request);
-        if (isHeadRequest(typeOfRequest)) {
-            return returnNoMessageBody(resourceRequested);
-        } else if (typeOfRequest.equals("OPTIONS")) {
-            return optionsMessageBody(resourceRequested);
-        } else if (typeOfRequest.equals("POST")) {
-            return postMessageBody(resourceRequested);
+        List<String> methodsRecognised = Arrays.asList("GET", "HEAD", "POST", "PUT", "DELETE", "CONNECT", "OPTIONS", "TRACE");
+        if (methodsRecognised.contains(typeOfRequest)) {
+            if (isHeadRequest(typeOfRequest)) {
+                return returnNoMessageBody(resourceRequested);
+            } else if (typeOfRequest.equals("OPTIONS")) {
+                return optionsMessageBody(resourceRequested);
+            } else if (typeOfRequest.equals("POST")) {
+                return postMessageBody(resourceRequested);
+            } else {
+                return returnMessageBody(resourceRequested);
+            }
         } else {
-            return returnMessageBody(resourceRequested);
+            return methodNotAllowed();
         }
     }
 
@@ -128,10 +134,14 @@ public class ResponseMaker {
         if (optionsResponse.contains("POST")) {
             return response + "POST is not supported";
         } else {
-            return response + buildStatusLine(METHOD_NOT_ALLOWED) + "\n" +
-            "Connection: close\n" +
-            "Allow: GET, HEAD, OPTIONS, PUT, DELETE\n";
+            return methodNotAllowed();
         }
+    }
+
+    private String methodNotAllowed() {
+        return buildStatusLine(METHOD_NOT_ALLOWED) + "\n" +
+        "Connection: close\n" +
+        "Allow: GET, HEAD, OPTIONS, PUT, DELETE\n";
     }
 
 }
