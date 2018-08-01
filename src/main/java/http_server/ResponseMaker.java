@@ -25,11 +25,6 @@ public class ResponseMaker {
         return "Unhandled file type";
     }
 
-
-    private boolean requestIsToHomePage(String resource) {
-        return resource.equals("/");
-    }
-
     public String returnResourceContents(String resource) {
         byte[] encodedContents;
         String contents = null;
@@ -60,27 +55,6 @@ public class ResponseMaker {
         }
     }
 
-    private String optionsMessageBody(String resourceRequested) {
-        String response = "" +
-                buildStatusLine(OK) + "\n" +
-                "Connection: close\n";
-
-        if (resourceRequested.equals("logs")) {
-            return response + "Allow: GET, HEAD, OPTIONS\n";
-        } else {
-            return response + "Allow: GET, HEAD, OPTIONS, PUT, DELETE\n";
-        }
-    }
-
-    private String returnMessageBody(String resourceRequested) {
-        String fileContents = returnResourceContents(resourceRequested);
-        String contentType = returnContentType(requestParser.parseContentType(resourceRequested));
-        String response = "" + statusResponse(resourceRequested) + "\n" +
-                "Connection: close\n" +
-                String.format("Content-Type: %s\n\n", contentType);
-        return response + fileContents;
-    }
-
     public String returnContentType(String fileExtension) {
         switch (fileExtension) {
             case "txt":
@@ -94,10 +68,13 @@ public class ResponseMaker {
         }
     }
 
-    private String returnNoMessageBody(String resourceRequested) {
-        String fileContents = "";
-        String response = fileContents + statusResponse(resourceRequested) + "\n";
-        return response + "\n";
+    private String returnMessageBody(String resourceRequested) {
+        String fileContents = returnResourceContents(resourceRequested);
+        String contentType = returnContentType(requestParser.parseContentType(resourceRequested));
+        String response = "" + statusResponse(resourceRequested) + "\n" +
+                "Connection: close\n" +
+                String.format("Content-Type: %s\n\n", contentType);
+        return response + fileContents;
     }
 
     private String isResourceAvailable(String resource) {
@@ -112,12 +89,34 @@ public class ResponseMaker {
         }
     }
 
+    private String buildStatusLine(StatusCodes statusCode) {
+        return "HTTP/1.1 " + statusCode.getStatusCode() + " " + statusCode.getStatusMessage();
+    }
+
+    private boolean requestIsToHomePage(String resource) {
+        return resource.equals("/");
+    }
+
     private boolean isHeadRequest(String typeOfRequest) {
         return typeOfRequest.equals("HEAD");
     }
 
-    private String buildStatusLine(StatusCodes statusCode) {
-        return "HTTP/1.1 " + statusCode.getStatusCode() + " " + statusCode.getStatusMessage();
+    private String returnNoMessageBody(String resourceRequested) {
+        String fileContents = "";
+        String response = fileContents + statusResponse(resourceRequested) + "\n";
+        return response + "\n";
+    }
+
+    private String optionsMessageBody(String resourceRequested) {
+        String response = "" +
+                buildStatusLine(OK) + "\n" +
+                "Connection: close\n";
+
+        if (resourceRequested.equals("logs")) {
+            return response + "Allow: GET, HEAD, OPTIONS\n";
+        } else {
+            return response + "Allow: GET, HEAD, OPTIONS, PUT, DELETE\n";
+        }
     }
 
 }

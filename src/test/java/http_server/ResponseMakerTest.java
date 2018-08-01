@@ -81,7 +81,7 @@ public class ResponseMakerTest {
                 OK.getStatusCode(),
                 space,
                 OK.getStatusMessage()) +
-                        "\n\n",
+                "\n\n",
 
                 responseMaker.buildWholeResponse("HEAD / HTTP/1.1"));
     }
