@@ -31,4 +31,5 @@ public class HttpSocketTest {
 
         assertEquals("Bye", clientSocket.getOutputStream().toString());
     }
+
 }

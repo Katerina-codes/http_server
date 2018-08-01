@@ -6,6 +6,7 @@ public class Server {
 
     public String host;
     public int port;
+    private ResponseMaker responseMaker = new ResponseMaker();
 
     public Server(String host, int port) {
         this.host = host;
@@ -13,27 +14,33 @@ public class Server {
     }
 
     public void run(ServerSocketManager socketManager) {
-        boolean serverRunning = true;
-        while (serverRunning) {
+        String response;
+
+        while (isServerRunning()) {
             ClientSocket clientSocket = socketManager.accept();
             String request = readFromSocketStream(clientSocket);
-
-            OutputStream output = clientSocket.getOutputStream();
-            PrintWriter writer = new PrintWriter(output);
-            writer.println("HTTP/1.1 200 OK" + request);
-            writer.flush();
-            serverRunning = false;
+            response = responseMaker.buildWholeResponse(request);
+            writeResponseToRequest(clientSocket, response);
+            clientSocket.close();
         }
     }
 
-    private String readFromSocketStream(ClientSocket clientSocket) {
+    private boolean isServerRunning() {
+        return true;
+    }
+
+    public void writeResponseToRequest(ClientSocket clientSocket, String response) {
+        OutputStream output = clientSocket.getOutputStream();
+        PrintWriter writer = new PrintWriter(output);
+        writer.print(response);
+        writer.flush();
+        writer.close();
+    }
+
+    public String readFromSocketStream(ClientSocket clientSocket) {
         InputStream request = clientSocket.getInputStream();
         InputStreamReader requestReader = new InputStreamReader(request);
         BufferedReader lineReader = new BufferedReader(requestReader);
-        return parseRequest(lineReader);
-    }
-
-    private String parseRequest(BufferedReader lineReader) {
         String requestContent = "";
         try {
             requestContent = lineReader.readLine();

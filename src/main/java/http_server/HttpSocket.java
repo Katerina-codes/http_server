@@ -1,6 +1,8 @@
 package http_server;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 
 public class HttpSocket implements ClientSocket {
@@ -29,4 +31,13 @@ public class HttpSocket implements ClientSocket {
         }
         return output;
     }
+
+    public void close() {
+        try {
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

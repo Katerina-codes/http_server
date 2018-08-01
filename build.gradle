@@ -1,6 +1,7 @@
 version '1.0-SNAPSHOT'
 
 apply plugin: 'java'
+apply plugin: 'application'
 
 sourceCompatibility = 1.8
 
@@ -11,6 +12,8 @@ jar {
              'Main-Class': 'http_server.StartServer'
     }
 }
+
+mainClassName = 'http_server.StartServer'
 
 repositories {
     mavenCentral()

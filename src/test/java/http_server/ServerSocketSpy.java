@@ -1,9 +1,6 @@
 package http_server;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 
 public class ServerSocketSpy implements ServerSocketManager {
 
@@ -41,8 +38,20 @@ public class ServerSocketSpy implements ServerSocketManager {
             return outputStream;
         }
 
+        public void close() {
+            try {
+                inputStream.close();
+                outputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         public String getOutputStreamContents() {
             return outputStream.toString();
         }
+
+
     }
+
 }
