@@ -1,5 +1,6 @@
 package http_server;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,13 +16,12 @@ public class ServerSpy extends Server {
     }
 
     public void run(ServerSocketManager socketManager) {
-        String response;
-
         while (isServerRunning()) {
             ClientSocket clientSocket = socketManager.accept();
             String request = readFromSocketStream(clientSocket);
-            response = responseMaker.buildWholeResponse(request);
-            writeResponseToRequest(clientSocket, response);
+            ByteArrayOutputStream response = responseMaker.buildWholeResponse(request);
+            byte[] newResponse = response.toByteArray();
+            writeResponseToRequest(clientSocket, newResponse);
             clientSocket.close();
         }
     }

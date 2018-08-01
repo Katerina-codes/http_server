@@ -1,7 +1,10 @@
 package http_server;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Arrays;
 
 import static http_server.StatusCodes.*;
 import static org.junit.Assert.assertEquals;
@@ -34,7 +37,7 @@ public class ResponseMakerTest {
 
     @Test
     public void returnsContentsOfFileOne() {
-        assertEquals("file1 contents", responseMaker.returnResourceContents("file1"));
+        Assert.assertArrayEquals("file1 contents".getBytes(), responseMaker.returnResourceContents("file1"));
     }
 
     @Test
@@ -49,19 +52,19 @@ public class ResponseMakerTest {
                 "Content-Type: text/plain" + "\n\n" +
                 "file1 contents",
 
-                responseMaker.buildWholeResponse("GET /file1 HTTP/1.0"));
+                responseMaker.buildWholeResponse("GET /file1 HTTP/1.0").toString());
     }
 
-    @Test
-    public void returnStatusFourOhFourIfFileIsNotFound() {
-        assertEquals(buildResponse(
-                responseStart,
-                NOT_FOUND.getStatusCode(),
-                space,
-                NOT_FOUND.getStatusMessage()),
+   @Test
+   public void returnsFourOhFourIfFileNotFoundFromRequest() {
+       assertEquals(buildResponse(
+               responseStart,
+               NOT_FOUND.getStatusCode(),
+               space,
+               NOT_FOUND.getStatusMessage()) + "\n",
 
-                responseMaker.statusResponse("/no_file_here.txt"));
-    }
+               responseMaker.buildWholeResponse("GET /no_file_here.txt HTTP/1.1").toString());
+   }
 
     @Test
     public void returnStatusOfOkIfResourceExistsButIsEmpty() {
@@ -83,7 +86,7 @@ public class ResponseMakerTest {
                 OK.getStatusMessage()) +
                 "\n\n",
 
-                responseMaker.buildWholeResponse("HEAD / HTTP/1.1"));
+                responseMaker.buildWholeResponse("HEAD / HTTP/1.1").toString());
     }
 
     @Test
@@ -96,7 +99,7 @@ public class ResponseMakerTest {
                "Connection: close\n" +
                "Allow: GET, HEAD, OPTIONS, PUT, DELETE\n",
 
-               responseMaker.buildWholeResponse("OPTIONS /file1 HTTP/1.1"));
+               responseMaker.buildWholeResponse("OPTIONS /file1 HTTP/1.1").toString());
     }
 
     @Test
@@ -109,7 +112,7 @@ public class ResponseMakerTest {
                 "Connection: close\n" +
                 "Allow: GET, HEAD, OPTIONS\n",
 
-                responseMaker.buildWholeResponse("OPTIONS /logs HTTP/1.1"));
+                responseMaker.buildWholeResponse("OPTIONS /logs HTTP/1.1").toString());
     }
 
     @Test
@@ -122,7 +125,7 @@ public class ResponseMakerTest {
                 "Connection: close\n" +
                 "Allow: GET, HEAD, OPTIONS, PUT, DELETE\n",
 
-                responseMaker.buildWholeResponse("POST /file1 HTTP/1.1"));
+                responseMaker.buildWholeResponse("POST /file1 HTTP/1.1").toString());
     }
 
     @Test
@@ -135,7 +138,7 @@ public class ResponseMakerTest {
                 "Connection: close\n" +
                 "Allow: GET, HEAD, OPTIONS, PUT, DELETE\n",
 
-                responseMaker.buildWholeResponse("RPZFEAXH /file1 HTTP/1.1"));
+                responseMaker.buildWholeResponse("RPZFEAXH /file1 HTTP/1.1").toString());
     }
 
     @Test
