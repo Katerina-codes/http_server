@@ -8,9 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import static http_server.Header.CLOSE_CONNECTION;
-import static http_server.Header.METHODS_ALLOWED_FOR_LOGS;
-import static http_server.Header.METHODS_ALLOWED_FOR_TXT_FILE;
+import static http_server.Header.*;
 import static http_server.HttpMethods.*;
 import static http_server.StatusCodes.METHOD_NOT_ALLOWED;
 import static http_server.StatusCodes.NOT_FOUND;
@@ -19,6 +17,15 @@ import static java.util.Arrays.asList;
 
 public class ResponseMaker {
 
+    public static final String BLANK_LINE = "\n\n";
+    public static final String NEW_LINE = "\n";
+    public static final String TEXT_PLAIN = "text/plain";
+    public static final String IMAGE_JPEG = "image/jpeg";
+    public static final String IMAGE_PNG = "image/png";
+    public static final String IMAGE_GIF = "image/gif";
+    public static final String TEXT = "txt";
+    public static final String JPEG = "jpeg";
+    public static final String PNG = "png";
     private RequestParser requestParser = new RequestParser();
 
     public String statusResponse(String file) {
@@ -70,14 +77,14 @@ public class ResponseMaker {
 
     public String returnContentType(String fileExtension) {
         switch (fileExtension) {
-            case "txt":
-                return "text/plain";
-            case "jpeg":
-                return "image/jpeg";
-            case "png":
-                return "image/png";
+            case TEXT:
+                return TEXT_PLAIN;
+            case JPEG:
+                return IMAGE_JPEG;
+            case PNG:
+                return IMAGE_PNG;
             default:
-                return "image/gif";
+                return IMAGE_GIF;
         }
     }
 
@@ -122,7 +129,7 @@ public class ResponseMaker {
     }
 
     private String buildStatusLine(StatusCodes statusCode) {
-        return "HTTP/1.1 " + statusCode.getStatusCode() + " " + statusCode.getStatusMessage();
+        return HTTP_VERSION.getText() + statusCode.getStatusCode() + " " + statusCode.getStatusMessage();
     }
 
     private boolean requestIsToHomePage(String resource) {
@@ -135,7 +142,7 @@ public class ResponseMaker {
 
     private ByteArrayOutputStream returnNoMessageBody(String resourceRequested) {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        byte[] response = (statusResponse(resourceRequested) + "\n\n").getBytes();
+        byte[] response = (statusResponse(resourceRequested) + BLANK_LINE).getBytes();
         try {
             output.write(response);
         } catch (IOException e) {
@@ -147,7 +154,7 @@ public class ResponseMaker {
     private ByteArrayOutputStream optionsMessageBody(String resourceRequested) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         byte[] response = ("" +
-                buildStatusLine(OK) + "\n" +
+                buildStatusLine(OK) + NEW_LINE +
                 CLOSE_CONNECTION.getText()).getBytes();
 
         if (resourceRequested.equals("logs")) {
@@ -173,7 +180,7 @@ public class ResponseMaker {
 
     private ByteArrayOutputStream postMessageBody(String resourceRequested) {
         ByteArrayOutputStream optionsResponse = optionsMessageBody(resourceRequested);
-        if (optionsResponse.toString().contains("POST")) {
+        if (optionsResponse.toString().contains(POST.toString())) {
             try {
                 optionsResponse.write( "POST is not supported".getBytes());
             } catch (IOException e) {

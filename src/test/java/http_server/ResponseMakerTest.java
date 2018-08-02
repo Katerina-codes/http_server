@@ -5,15 +5,14 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static http_server.Header.*;
+import static http_server.ResponseMaker.*;
 import static http_server.StatusCodes.*;
 import static org.junit.Assert.assertEquals;
 
 public class ResponseMakerTest {
 
-    private final String blankLine = "\n\n";
     private String space = " ";
     private ResponseMaker responseMaker;
-    private String newLine = "\n";
 
     @Before
     public void setUp() {
@@ -46,9 +45,9 @@ public class ResponseMakerTest {
                 HTTP_VERSION.getText(),
                 OK.getStatusCode(),
                 space,
-                OK.getStatusMessage()) + newLine +
+                OK.getStatusMessage()) + NEW_LINE +
                 CLOSE_CONNECTION.getText() +
-                CONTENT_TYPE.getText() + "text/plain" + blankLine +
+                CONTENT_TYPE.getText() + TEXT_PLAIN + BLANK_LINE +
                 "file1 contents",
 
                 responseMaker.buildWholeResponse("GET /file1 HTTP/1.1").toString());
@@ -60,7 +59,7 @@ public class ResponseMakerTest {
                HTTP_VERSION.getText(),
                NOT_FOUND.getStatusCode(),
                space,
-               NOT_FOUND.getStatusMessage()) + newLine,
+               NOT_FOUND.getStatusMessage()) + NEW_LINE,
 
                responseMaker.buildWholeResponse("GET /no_file_here.txt HTTP/1.1").toString());
    }
@@ -83,7 +82,7 @@ public class ResponseMakerTest {
                 OK.getStatusCode(),
                 space,
                 OK.getStatusMessage()) +
-                blankLine,
+                        BLANK_LINE,
 
                 responseMaker.buildWholeResponse("HEAD / HTTP/1.1").toString());
     }
@@ -94,7 +93,7 @@ public class ResponseMakerTest {
                HTTP_VERSION.getText(),
                OK.getStatusCode(),
                space,
-               OK.getStatusMessage()) + newLine +
+               OK.getStatusMessage()) + NEW_LINE +
                CLOSE_CONNECTION.getText() +
                METHODS_ALLOWED_FOR_TXT_FILE.getText(),
 
@@ -107,7 +106,7 @@ public class ResponseMakerTest {
                 HTTP_VERSION.getText(),
                 OK.getStatusCode(),
                 space,
-                OK.getStatusMessage()) + newLine +
+                OK.getStatusMessage()) + NEW_LINE +
                 CLOSE_CONNECTION.getText() +
                 METHODS_ALLOWED_FOR_LOGS.getText(),
 
@@ -120,7 +119,7 @@ public class ResponseMakerTest {
                 HTTP_VERSION.getText(),
                 METHOD_NOT_ALLOWED.getStatusCode(),
                 space,
-                METHOD_NOT_ALLOWED.getStatusMessage()) + newLine +
+                METHOD_NOT_ALLOWED.getStatusMessage()) + NEW_LINE +
                 CLOSE_CONNECTION.getText() +
                 METHODS_ALLOWED_FOR_TXT_FILE.getText(),
 
@@ -133,7 +132,7 @@ public class ResponseMakerTest {
                 HTTP_VERSION.getText(),
                 METHOD_NOT_ALLOWED.getStatusCode(),
                 space,
-                METHOD_NOT_ALLOWED.getStatusMessage()) + newLine +
+                METHOD_NOT_ALLOWED.getStatusMessage()) + NEW_LINE +
                 CLOSE_CONNECTION.getText() +
                 METHODS_ALLOWED_FOR_TXT_FILE.getText(),
 
@@ -142,26 +141,23 @@ public class ResponseMakerTest {
 
     @Test
     public void returnsCorrectContentTypeForJpeg() {
-        String fileExtension = "jpeg";
-        assertEquals("image/jpeg", responseMaker.returnContentType(fileExtension));
+        assertEquals(IMAGE_JPEG, responseMaker.returnContentType(JPEG));
     }
 
     @Test
     public void returnsCorrectContentTypeForTxt() {
-        String fileExtension = "txt";
-        assertEquals("text/plain", responseMaker.returnContentType(fileExtension));
+        assertEquals(TEXT_PLAIN, responseMaker.returnContentType(TEXT));
     }
 
     @Test
     public void returnsCorrectContentTypeForPng() {
-        String fileExtension = "png";
-        assertEquals("image/png", responseMaker.returnContentType(fileExtension));
+        assertEquals(IMAGE_PNG, responseMaker.returnContentType(PNG));
     }
 
     @Test
     public void returnsCorrectContentTypeForGif() {
         String fileExtension = "gif";
-        assertEquals("image/gif", responseMaker.returnContentType(fileExtension));
+        assertEquals(IMAGE_GIF, responseMaker.returnContentType(fileExtension));
     }
 
 }

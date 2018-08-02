@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import static http_server.HttpMethods.GET;
 import static http_server.HttpMethods.HEAD;
+import static http_server.ResponseMaker.JPEG;
 import static org.junit.Assert.assertEquals;
 
 public class RequestParserTest {
@@ -56,7 +57,7 @@ public class RequestParserTest {
 
     @Test
     public void parsesContentType() {
-        assertEquals("jpeg", requestParser.parseContentType("image.jpeg"));
+        assertEquals(JPEG, requestParser.parseContentType("image.jpeg"));
     }
 
 }
