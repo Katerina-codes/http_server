@@ -22,6 +22,8 @@ Step 3:
 gradle jar
 ```
 
+The path to the jar is: `build/libs/server-1.0-SNAPSHOT.jar`
+
 ## Running the acceptance tests
 
 Clone `cob_spec`:
