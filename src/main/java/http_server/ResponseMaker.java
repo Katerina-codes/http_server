@@ -8,6 +8,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import static http_server.Header.CLOSE_CONNECTION;
+import static http_server.Header.METHODS_ALLOWED_FOR_LOGS;
+import static http_server.Header.METHODS_ALLOWED_FOR_TXT_FILE;
 import static http_server.HttpMethods.*;
 import static http_server.StatusCodes.METHOD_NOT_ALLOWED;
 import static http_server.StatusCodes.NOT_FOUND;
@@ -27,7 +30,7 @@ public class ResponseMaker {
                 return buildStatusLine(statusCode);
             }
         }
-        return "Unhandled file type";
+        return NOT_FOUND.getStatusMessage();
     }
 
     public byte[] returnResourceContents(String resource) {
@@ -81,7 +84,7 @@ public class ResponseMaker {
     private ByteArrayOutputStream returnMessageBody(String resourceRequested) {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
 
-        if (isResourceAvailable(resourceRequested).equals("404")) {
+        if (isResourceAvailable(resourceRequested).equals(NOT_FOUND.getStatusCode())) {
             byte[] statusResponse = (statusResponse(resourceRequested) + "\n").getBytes();
             try {
                 output.write(statusResponse);
@@ -92,7 +95,7 @@ public class ResponseMaker {
             byte[] fileContents = returnResourceContents(resourceRequested);
             String contentType = returnContentType(requestParser.parseContentType(resourceRequested));
             byte[] statusResponse = (statusResponse(resourceRequested) + "\n").getBytes();
-            byte[] closeConnection = "Connection: close\n".getBytes();
+            byte[] closeConnection = CLOSE_CONNECTION.getText().getBytes();
             byte[] formatContentType = String.format("Content-Type: %s\n\n", contentType).getBytes();
             try {
                 output.write(statusResponse);
@@ -145,13 +148,13 @@ public class ResponseMaker {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         byte[] response = ("" +
                 buildStatusLine(OK) + "\n" +
-                "Connection: close\n").getBytes();
+                CLOSE_CONNECTION.getText()).getBytes();
 
         if (resourceRequested.equals("logs")) {
             try {
                 outputStream.write(response);
-                byte[] logAllows = ("Allow: GET, HEAD, OPTIONS\n").getBytes();
-                outputStream.write(logAllows);
+                byte[] methodsAllowed = (METHODS_ALLOWED_FOR_LOGS.getText()).getBytes();
+                outputStream.write(methodsAllowed);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -159,8 +162,8 @@ public class ResponseMaker {
         } else {
             try {
                 outputStream.write(response);
-                byte[] textAllows = ("Allow: GET, HEAD, OPTIONS, PUT, DELETE\n").getBytes();
-                outputStream.write(textAllows);
+                byte[] methodsAllowed = (METHODS_ALLOWED_FOR_TXT_FILE.getText()).getBytes();
+                outputStream.write(methodsAllowed);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -185,8 +188,8 @@ public class ResponseMaker {
     private ByteArrayOutputStream methodNotAllowed() {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         byte[] bytes = (buildStatusLine(METHOD_NOT_ALLOWED) + "\n" +
-                "Connection: close\n" +
-                "Allow: GET, HEAD, OPTIONS, PUT, DELETE\n").getBytes();
+                CLOSE_CONNECTION.getText() +
+                METHODS_ALLOWED_FOR_TXT_FILE.getText()).getBytes();
         try {
             outputStream.write(bytes);
         } catch (IOException e) {

@@ -4,16 +4,16 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Arrays;
-
+import static http_server.Header.*;
 import static http_server.StatusCodes.*;
 import static org.junit.Assert.assertEquals;
 
 public class ResponseMakerTest {
 
-    private String responseStart = "HTTP/1.1 ";
+    private final String blankLine = "\n\n";
     private String space = " ";
     private ResponseMaker responseMaker;
+    private String newLine = "\n";
 
     @Before
     public void setUp() {
@@ -27,7 +27,7 @@ public class ResponseMakerTest {
     @Test
     public void statusOkIfFileExists() {
         assertEquals(buildResponse(
-                responseStart,
+                HTTP_VERSION.getText(),
                 OK.getStatusCode(),
                 space,
                 OK.getStatusMessage()),
@@ -42,26 +42,25 @@ public class ResponseMakerTest {
 
     @Test
     public void buildsWholeResponse() {
-
         assertEquals(buildResponse(
-                responseStart,
+                HTTP_VERSION.getText(),
                 OK.getStatusCode(),
                 space,
-                OK.getStatusMessage()) + "\n" +
-                "Connection: close\n" +
-                "Content-Type: text/plain" + "\n\n" +
+                OK.getStatusMessage()) + newLine +
+                CLOSE_CONNECTION.getText() +
+                CONTENT_TYPE.getText() + "text/plain" + blankLine +
                 "file1 contents",
 
-                responseMaker.buildWholeResponse("GET /file1 HTTP/1.0").toString());
+                responseMaker.buildWholeResponse("GET /file1 HTTP/1.1").toString());
     }
 
    @Test
    public void returnsFourOhFourIfFileNotFoundFromRequest() {
        assertEquals(buildResponse(
-               responseStart,
+               HTTP_VERSION.getText(),
                NOT_FOUND.getStatusCode(),
                space,
-               NOT_FOUND.getStatusMessage()) + "\n",
+               NOT_FOUND.getStatusMessage()) + newLine,
 
                responseMaker.buildWholeResponse("GET /no_file_here.txt HTTP/1.1").toString());
    }
@@ -69,7 +68,7 @@ public class ResponseMakerTest {
     @Test
     public void returnStatusOfOkIfResourceExistsButIsEmpty() {
         assertEquals(buildResponse(
-                responseStart,
+                HTTP_VERSION.getText(),
                 OK.getStatusCode(),
                 space,
                 OK.getStatusMessage()),
@@ -80,11 +79,11 @@ public class ResponseMakerTest {
     @Test
     public void headRequestReturnsNoMessageBody() {
         assertEquals(buildResponse(
-                responseStart,
+                HTTP_VERSION.getText(),
                 OK.getStatusCode(),
                 space,
                 OK.getStatusMessage()) +
-                "\n\n",
+                blankLine,
 
                 responseMaker.buildWholeResponse("HEAD / HTTP/1.1").toString());
     }
@@ -92,12 +91,12 @@ public class ResponseMakerTest {
     @Test
     public void responseToOptionsRequestContainsMethodsItSupports() {
        assertEquals(buildResponse(
-               responseStart,
+               HTTP_VERSION.getText(),
                OK.getStatusCode(),
                space,
-               OK.getStatusMessage()) + "\n" +
-               "Connection: close\n" +
-               "Allow: GET, HEAD, OPTIONS, PUT, DELETE\n",
+               OK.getStatusMessage()) + newLine +
+               CLOSE_CONNECTION.getText() +
+               METHODS_ALLOWED_FOR_TXT_FILE.getText(),
 
                responseMaker.buildWholeResponse("OPTIONS /file1 HTTP/1.1").toString());
     }
@@ -105,12 +104,12 @@ public class ResponseMakerTest {
     @Test
     public void returnsDifferentMethodsForLogsResource() {
         assertEquals(buildResponse(
-                responseStart,
+                HTTP_VERSION.getText(),
                 OK.getStatusCode(),
                 space,
-                OK.getStatusMessage()) + "\n" +
-                "Connection: close\n" +
-                "Allow: GET, HEAD, OPTIONS\n",
+                OK.getStatusMessage()) + newLine +
+                CLOSE_CONNECTION.getText() +
+                METHODS_ALLOWED_FOR_LOGS.getText(),
 
                 responseMaker.buildWholeResponse("OPTIONS /logs HTTP/1.1").toString());
     }
@@ -118,12 +117,12 @@ public class ResponseMakerTest {
     @Test
     public void textFileDoesNotAllowPostMethodRequest() {
         assertEquals(buildResponse(
-                responseStart,
-                "405",
+                HTTP_VERSION.getText(),
+                METHOD_NOT_ALLOWED.getStatusCode(),
                 space,
-                "Method Not Allowed") + "\n" +
-                "Connection: close\n" +
-                "Allow: GET, HEAD, OPTIONS, PUT, DELETE\n",
+                METHOD_NOT_ALLOWED.getStatusMessage()) + newLine +
+                CLOSE_CONNECTION.getText() +
+                METHODS_ALLOWED_FOR_TXT_FILE.getText(),
 
                 responseMaker.buildWholeResponse("POST /file1 HTTP/1.1").toString());
     }
@@ -131,12 +130,12 @@ public class ResponseMakerTest {
     @Test
     public void serverDoesNotAllowBogusRequest() {
         assertEquals(buildResponse(
-                responseStart,
-                "405",
+                HTTP_VERSION.getText(),
+                METHOD_NOT_ALLOWED.getStatusCode(),
                 space,
-                "Method Not Allowed") + "\n" +
-                "Connection: close\n" +
-                "Allow: GET, HEAD, OPTIONS, PUT, DELETE\n",
+                METHOD_NOT_ALLOWED.getStatusMessage()) + newLine +
+                CLOSE_CONNECTION.getText() +
+                METHODS_ALLOWED_FOR_TXT_FILE.getText(),
 
                 responseMaker.buildWholeResponse("RPZFEAXH /file1 HTTP/1.1").toString());
     }
