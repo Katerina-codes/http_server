@@ -3,6 +3,7 @@ package http_server;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
@@ -48,7 +49,10 @@ public class ResponseMaker {
         } else {
             String filePath = String.format("public/%s", resource);
             try {
-                contents = Files.readAllBytes(Paths.get(filePath));
+                Path path = Paths.get(filePath);
+                if (Files.exists(path)) {
+                    contents = Files.readAllBytes(path);
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -120,7 +124,7 @@ public class ResponseMaker {
         if (requestIsToHomePage(resource)) {
             return OK.getStatusCode();
         } else {
-            if (!Objects.equals(Arrays.toString(returnResourceContents(resource)), "null")) {
+            if (returnResourceContents(resource) != null) {
                 return OK.getStatusCode();
             } else {
                 return NOT_FOUND.getStatusCode();
