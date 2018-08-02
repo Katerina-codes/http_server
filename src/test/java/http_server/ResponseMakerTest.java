@@ -35,11 +35,6 @@ public class ResponseMakerTest {
     }
 
     @Test
-    public void returnsContentsOfFileOne() {
-        Assert.assertArrayEquals("file1 contents".getBytes(), responseMaker.returnResourceContents("file1"));
-    }
-
-    @Test
     public void buildsWholeResponse() {
         assertEquals(buildResponse(
                 HTTP_VERSION.getText(),

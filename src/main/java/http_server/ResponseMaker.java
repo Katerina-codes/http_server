@@ -2,18 +2,12 @@ package http_server;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 import static http_server.Header.*;
 import static http_server.HttpMethods.*;
-import static http_server.StatusCodes.METHOD_NOT_ALLOWED;
-import static http_server.StatusCodes.NOT_FOUND;
-import static http_server.StatusCodes.OK;
+import static http_server.StatusCodes.*;
 import static java.util.Arrays.asList;
 
 public class ResponseMaker {
@@ -28,6 +22,7 @@ public class ResponseMaker {
     public static final String JPEG = "jpeg";
     public static final String PNG = "png";
     private RequestParser requestParser = new RequestParser();
+    private FileReader fileReader = new FileReader();
 
     public String statusResponse(String file) {
         String statusCodeForResource = isResourceAvailable(file);
@@ -39,25 +34,6 @@ public class ResponseMaker {
             }
         }
         return NOT_FOUND.getStatusMessage();
-    }
-
-    public byte[] returnResourceContents(String resource) {
-        byte[] contents = null;
-
-        if (requestIsToHomePage(resource)) {
-            return "".getBytes();
-        } else {
-            String filePath = String.format("public/%s", resource);
-            try {
-                Path path = Paths.get(filePath);
-                if (Files.exists(path)) {
-                    contents = Files.readAllBytes(path);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return contents;
-        }
     }
 
     public ByteArrayOutputStream buildWholeResponse(String request) {
@@ -103,7 +79,7 @@ public class ResponseMaker {
                 e.printStackTrace();
             }
         } else {
-            byte[] fileContents = returnResourceContents(resourceRequested);
+            byte[] fileContents = fileReader.returnResourceContents(resourceRequested);
             String contentType = returnContentType(requestParser.parseContentType(resourceRequested));
             byte[] statusResponse = (statusResponse(resourceRequested) + "\n").getBytes();
             byte[] closeConnection = CLOSE_CONNECTION.getText().getBytes();
@@ -121,10 +97,10 @@ public class ResponseMaker {
     }
 
     private String isResourceAvailable(String resource) {
-        if (requestIsToHomePage(resource)) {
+        if (fileReader.requestIsToHomePage(resource)) {
             return OK.getStatusCode();
         } else {
-            if (returnResourceContents(resource) != null) {
+            if (fileReader.returnResourceContents(resource) != null) {
                 return OK.getStatusCode();
             } else {
                 return NOT_FOUND.getStatusCode();
@@ -134,10 +110,6 @@ public class ResponseMaker {
 
     private String buildStatusLine(StatusCodes statusCode) {
         return HTTP_VERSION.getText() + statusCode.getStatusCode() + " " + statusCode.getStatusMessage();
-    }
-
-    private boolean requestIsToHomePage(String resource) {
-        return resource.equals("/");
     }
 
     private boolean isHeadRequest(HttpMethods typeOfRequest) {
