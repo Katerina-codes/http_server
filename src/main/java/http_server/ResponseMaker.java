@@ -1,16 +1,31 @@
 package http_server;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
+import static http_server.Header.*;
+import static http_server.HttpMethods.*;
+import static http_server.StatusCodes.METHOD_NOT_ALLOWED;
 import static http_server.StatusCodes.NOT_FOUND;
 import static http_server.StatusCodes.OK;
 import static java.util.Arrays.asList;
 
 public class ResponseMaker {
 
+    public static final String BLANK_LINE = "\n\n";
+    public static final String NEW_LINE = "\n";
+    public static final String TEXT_PLAIN = "text/plain";
+    public static final String IMAGE_JPEG = "image/jpeg";
+    public static final String IMAGE_PNG = "image/png";
+    public static final String IMAGE_GIF = "image/gif";
+    public static final String TEXT = "txt";
+    public static final String JPEG = "jpeg";
+    public static final String PNG = "png";
     private RequestParser requestParser = new RequestParser();
 
     public String statusResponse(String file) {
@@ -22,25 +37,18 @@ public class ResponseMaker {
                 return buildStatusLine(statusCode);
             }
         }
-        return "Unhandled file type";
+        return NOT_FOUND.getStatusMessage();
     }
 
-
-    private boolean requestIsToHomePage(String resource) {
-        return resource.equals("/");
-    }
-
-    public String returnResourceContents(String resource) {
-        byte[] encodedContents;
-        String contents = null;
+    public byte[] returnResourceContents(String resource) {
+        byte[] contents = null;
 
         if (requestIsToHomePage(resource)) {
-            return "";
+            return "".getBytes();
         } else {
             String filePath = String.format("public/%s", resource);
             try {
-                encodedContents = Files.readAllBytes(Paths.get(filePath));
-                contents = new String(encodedContents, "US-ASCII");
+                contents = Files.readAllBytes(Paths.get(filePath));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -48,49 +56,71 @@ public class ResponseMaker {
         }
     }
 
-    public String buildWholeResponse(String request) {
-        String typeOfRequest = requestParser.extractMethodFromRequest(request);
+    public ByteArrayOutputStream buildWholeResponse(String request) {
+        HttpMethods typeOfRequest = requestParser.extractMethodFromRequest(request);
         String resourceRequested = requestParser.parseResource(request);
-        if (isHeadRequest(typeOfRequest)) {
-            return returnNoMessageBody(resourceRequested);
+        List<HttpMethods> methodsRecognised = Arrays.asList(GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, TRACE);
+        if (methodsRecognised.contains(typeOfRequest)) {
+            if (isHeadRequest(typeOfRequest)) {
+                return returnNoMessageBody(resourceRequested);
+            } else if (typeOfRequest.equals(OPTIONS)) {
+                return optionsMessageBody(resourceRequested);
+            } else if (typeOfRequest.equals(POST)) {
+                return postMessageBody(resourceRequested);
+            } else {
+                return returnMessageBody(resourceRequested);
+            }
         } else {
-            return returnMessageBody(resourceRequested);
+            return methodNotAllowed();
         }
-    }
-
-    private String returnMessageBody(String resourceRequested) {
-        String fileContents = returnResourceContents(resourceRequested);
-        String contentType = returnContentType(requestParser.parseContentType(resourceRequested));
-        String response = "" + statusResponse(resourceRequested) + "\n" +
-                "Connection: close\n" +
-                String.format("Content-Type: %s\n\n", contentType);
-        return response + fileContents;
     }
 
     public String returnContentType(String fileExtension) {
         switch (fileExtension) {
-            case "txt":
-                return "text/plain";
-            case "jpeg":
-                return "image/jpeg";
-            case "png":
-                return "image/png";
+            case TEXT:
+                return TEXT_PLAIN;
+            case JPEG:
+                return IMAGE_JPEG;
+            case PNG:
+                return IMAGE_PNG;
             default:
-                return "image/gif";
+                return IMAGE_GIF;
         }
     }
 
-    private String returnNoMessageBody(String resourceRequested) {
-        String fileContents = "";
-        String response = fileContents + statusResponse(resourceRequested) + "\n";
-        return response + "\n";
+    private ByteArrayOutputStream returnMessageBody(String resourceRequested) {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+
+        if (isResourceAvailable(resourceRequested).equals(NOT_FOUND.getStatusCode())) {
+            byte[] statusResponse = (statusResponse(resourceRequested) + "\n").getBytes();
+            try {
+                output.write(statusResponse);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            byte[] fileContents = returnResourceContents(resourceRequested);
+            String contentType = returnContentType(requestParser.parseContentType(resourceRequested));
+            byte[] statusResponse = (statusResponse(resourceRequested) + "\n").getBytes();
+            byte[] closeConnection = CLOSE_CONNECTION.getText().getBytes();
+            byte[] formatContentType = String.format("Content-Type: %s\n\n", contentType).getBytes();
+            try {
+                output.write(statusResponse);
+                output.write(closeConnection);
+                output.write(formatContentType);
+                output.write(fileContents);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return output;
     }
 
     private String isResourceAvailable(String resource) {
         if (requestIsToHomePage(resource)) {
             return OK.getStatusCode();
         } else {
-            if (returnResourceContents(resource) != null) {
+            if (!Objects.equals(Arrays.toString(returnResourceContents(resource)), "null")) {
                 return OK.getStatusCode();
             } else {
                 return NOT_FOUND.getStatusCode();
@@ -98,12 +128,81 @@ public class ResponseMaker {
         }
     }
 
-    private boolean isHeadRequest(String typeOfRequest) {
-        return typeOfRequest.equals("HEAD");
+    private String buildStatusLine(StatusCodes statusCode) {
+        return HTTP_VERSION.getText() + statusCode.getStatusCode() + " " + statusCode.getStatusMessage();
     }
 
-    private String buildStatusLine(StatusCodes statusCode) {
-        return "HTTP/1.1 " + statusCode.getStatusCode() + " " + statusCode.getStatusMessage();
+    private boolean requestIsToHomePage(String resource) {
+        return resource.equals("/");
+    }
+
+    private boolean isHeadRequest(HttpMethods typeOfRequest) {
+        return typeOfRequest.equals(HEAD);
+    }
+
+    private ByteArrayOutputStream returnNoMessageBody(String resourceRequested) {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        byte[] response = (statusResponse(resourceRequested) + BLANK_LINE).getBytes();
+        try {
+            output.write(response);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return output;
+    }
+
+    private ByteArrayOutputStream optionsMessageBody(String resourceRequested) {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        byte[] response = ("" +
+                buildStatusLine(OK) + NEW_LINE +
+                CLOSE_CONNECTION.getText()).getBytes();
+
+        if (resourceRequested.equals("logs")) {
+            try {
+                outputStream.write(response);
+                byte[] methodsAllowed = (METHODS_ALLOWED_FOR_LOGS.getText()).getBytes();
+                outputStream.write(methodsAllowed);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return outputStream;
+        } else {
+            try {
+                outputStream.write(response);
+                byte[] methodsAllowed = (METHODS_ALLOWED_FOR_TXT_FILE.getText()).getBytes();
+                outputStream.write(methodsAllowed);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return outputStream;
+        }
+    }
+
+    private ByteArrayOutputStream postMessageBody(String resourceRequested) {
+        ByteArrayOutputStream optionsResponse = optionsMessageBody(resourceRequested);
+        if (optionsResponse.toString().contains(POST.toString())) {
+            try {
+                optionsResponse.write( "POST is not supported".getBytes());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return optionsResponse;
+        } else {
+            return methodNotAllowed();
+        }
+    }
+
+    private ByteArrayOutputStream methodNotAllowed() {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        byte[] bytes = (buildStatusLine(METHOD_NOT_ALLOWED) + "\n" +
+                CLOSE_CONNECTION.getText() +
+                METHODS_ALLOWED_FOR_TXT_FILE.getText()).getBytes();
+        try {
+            outputStream.write(bytes);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return outputStream;
     }
 
 }
