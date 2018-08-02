@@ -12,7 +12,6 @@ public class StartServer {
         int port = 5000;
         Server server = new Server("localhost", port);
         try {
-            List<Boolean> list = asList(true);
             server.run(new HttpServerSocket(new ServerSocket(port)));
         } catch (IOException e) {
             e.printStackTrace();
