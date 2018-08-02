@@ -1,5 +1,9 @@
 package http_server;
 
+import java.util.List;
+
+import static java.util.Arrays.asList;
+
 public class RequestParser {
 
     public String parseResource(String request) {
@@ -12,8 +16,16 @@ public class RequestParser {
         }
     }
 
-    public String extractMethodFromRequest(String request) {
-        return request.substring(0, request.lastIndexOf(" /"));
+    public HttpMethods extractMethodFromRequest(String request) {
+        String methodFromRequest = request.substring(0, request.lastIndexOf(" /"));
+        HttpMethods convertedMethod = null;
+        List<HttpMethods> methods = asList(HttpMethods.values());
+        for (HttpMethods method : methods) {
+            if (method.toString().equals(methodFromRequest)) {
+                convertedMethod = method;
+            }
+        }
+        return convertedMethod;
     }
 
     public String parseContentType(String resource) {

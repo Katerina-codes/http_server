@@ -1,14 +1,16 @@
 package http_server;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import static http_server.Header.*;
+import static http_server.ResponseMaker.*;
 import static http_server.StatusCodes.*;
 import static org.junit.Assert.assertEquals;
 
 public class ResponseMakerTest {
 
-    private String responseStart = "HTTP/1.1 ";
     private String space = " ";
     private ResponseMaker responseMaker;
 
@@ -24,7 +26,7 @@ public class ResponseMakerTest {
     @Test
     public void statusOkIfFileExists() {
         assertEquals(buildResponse(
-                responseStart,
+                HTTP_VERSION.getText(),
                 OK.getStatusCode(),
                 space,
                 OK.getStatusMessage()),
@@ -34,39 +36,38 @@ public class ResponseMakerTest {
 
     @Test
     public void returnsContentsOfFileOne() {
-        assertEquals("file1 contents", responseMaker.returnResourceContents("file1"));
+        Assert.assertArrayEquals("file1 contents".getBytes(), responseMaker.returnResourceContents("file1"));
     }
 
     @Test
     public void buildsWholeResponse() {
-
         assertEquals(buildResponse(
-                responseStart,
+                HTTP_VERSION.getText(),
                 OK.getStatusCode(),
                 space,
-                OK.getStatusMessage()) + "\n" +
-                "Connection: close\n" +
-                "Content-Type: text/plain" + "\n\n" +
+                OK.getStatusMessage()) + NEW_LINE +
+                CLOSE_CONNECTION.getText() +
+                CONTENT_TYPE.getText() + TEXT_PLAIN + BLANK_LINE +
                 "file1 contents",
 
-                responseMaker.buildWholeResponse("GET /file1 HTTP/1.0"));
+                responseMaker.buildWholeResponse("GET /file1 HTTP/1.1").toString());
     }
 
-    @Test
-    public void returnStatusFourOhFourIfFileIsNotFound() {
-        assertEquals(buildResponse(
-                responseStart,
-                NOT_FOUND.getStatusCode(),
-                space,
-                NOT_FOUND.getStatusMessage()),
+   @Test
+   public void returnsFourOhFourIfFileNotFoundFromRequest() {
+       assertEquals(buildResponse(
+               HTTP_VERSION.getText(),
+               NOT_FOUND.getStatusCode(),
+               space,
+               NOT_FOUND.getStatusMessage()) + NEW_LINE,
 
-                responseMaker.statusResponse("/no_file_here.txt"));
-    }
+               responseMaker.buildWholeResponse("GET /no_file_here.txt HTTP/1.1").toString());
+   }
 
     @Test
     public void returnStatusOfOkIfResourceExistsButIsEmpty() {
         assertEquals(buildResponse(
-                responseStart,
+                HTTP_VERSION.getText(),
                 OK.getStatusCode(),
                 space,
                 OK.getStatusMessage()),
@@ -77,63 +78,86 @@ public class ResponseMakerTest {
     @Test
     public void headRequestReturnsNoMessageBody() {
         assertEquals(buildResponse(
-                responseStart,
+                HTTP_VERSION.getText(),
                 OK.getStatusCode(),
                 space,
                 OK.getStatusMessage()) +
-                "\n\n",
+                        BLANK_LINE,
 
-                responseMaker.buildWholeResponse("HEAD / HTTP/1.1"));
+                responseMaker.buildWholeResponse("HEAD / HTTP/1.1").toString());
     }
 
     @Test
     public void responseToOptionsRequestContainsMethodsItSupports() {
        assertEquals(buildResponse(
-               responseStart,
+               HTTP_VERSION.getText(),
                OK.getStatusCode(),
                space,
-               OK.getStatusMessage()) + "\n" +
-               "Connection: close\n" +
-               "Allow: GET, HEAD, OPTIONS, PUT, DELETE\n",
+               OK.getStatusMessage()) + NEW_LINE +
+               CLOSE_CONNECTION.getText() +
+               METHODS_ALLOWED_FOR_TXT_FILE.getText(),
 
-               responseMaker.buildWholeResponse("OPTIONS /file1 HTTP/1.1"));
+               responseMaker.buildWholeResponse("OPTIONS /file1 HTTP/1.1").toString());
     }
 
     @Test
     public void returnsDifferentMethodsForLogsResource() {
         assertEquals(buildResponse(
-                responseStart,
+                HTTP_VERSION.getText(),
                 OK.getStatusCode(),
                 space,
-                OK.getStatusMessage()) + "\n" +
-                "Connection: close\n" +
-                "Allow: GET, HEAD, OPTIONS\n",
+                OK.getStatusMessage()) + NEW_LINE +
+                CLOSE_CONNECTION.getText() +
+                METHODS_ALLOWED_FOR_LOGS.getText(),
 
-                responseMaker.buildWholeResponse("OPTIONS /logs HTTP/1.1"));
+                responseMaker.buildWholeResponse("OPTIONS /logs HTTP/1.1").toString());
+    }
+
+    @Test
+    public void textFileDoesNotAllowPostMethodRequest() {
+        assertEquals(buildResponse(
+                HTTP_VERSION.getText(),
+                METHOD_NOT_ALLOWED.getStatusCode(),
+                space,
+                METHOD_NOT_ALLOWED.getStatusMessage()) + NEW_LINE +
+                CLOSE_CONNECTION.getText() +
+                METHODS_ALLOWED_FOR_TXT_FILE.getText(),
+
+                responseMaker.buildWholeResponse("POST /file1 HTTP/1.1").toString());
+    }
+
+    @Test
+    public void serverDoesNotAllowBogusRequest() {
+        assertEquals(buildResponse(
+                HTTP_VERSION.getText(),
+                METHOD_NOT_ALLOWED.getStatusCode(),
+                space,
+                METHOD_NOT_ALLOWED.getStatusMessage()) + NEW_LINE +
+                CLOSE_CONNECTION.getText() +
+                METHODS_ALLOWED_FOR_TXT_FILE.getText(),
+
+                responseMaker.buildWholeResponse("RPZFEAXH /file1 HTTP/1.1").toString());
     }
 
     @Test
     public void returnsCorrectContentTypeForJpeg() {
-        String fileExtension = "jpeg";
-        assertEquals("image/jpeg", responseMaker.returnContentType(fileExtension));
+        assertEquals(IMAGE_JPEG, responseMaker.returnContentType(JPEG));
     }
 
     @Test
     public void returnsCorrectContentTypeForTxt() {
-        String fileExtension = "txt";
-        assertEquals("text/plain", responseMaker.returnContentType(fileExtension));
+        assertEquals(TEXT_PLAIN, responseMaker.returnContentType(TEXT));
     }
 
     @Test
     public void returnsCorrectContentTypeForPng() {
-        String fileExtension = "png";
-        assertEquals("image/png", responseMaker.returnContentType(fileExtension));
+        assertEquals(IMAGE_PNG, responseMaker.returnContentType(PNG));
     }
 
     @Test
     public void returnsCorrectContentTypeForGif() {
         String fileExtension = "gif";
-        assertEquals("image/gif", responseMaker.returnContentType(fileExtension));
+        assertEquals(IMAGE_GIF, responseMaker.returnContentType(fileExtension));
     }
 
 }

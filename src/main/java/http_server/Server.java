@@ -14,13 +14,12 @@ public class Server {
     }
 
     public void run(ServerSocketManager socketManager) {
-        String response;
-
         while (isServerRunning()) {
             ClientSocket clientSocket = socketManager.accept();
             String request = readFromSocketStream(clientSocket);
-            response = responseMaker.buildWholeResponse(request);
-            writeResponseToRequest(clientSocket, response);
+            ByteArrayOutputStream response = responseMaker.buildWholeResponse(request);
+            byte[] newResponse = response.toByteArray();
+            writeResponseToRequest(clientSocket, newResponse);
             clientSocket.close();
         }
     }
@@ -29,12 +28,15 @@ public class Server {
         return true;
     }
 
-    public void writeResponseToRequest(ClientSocket clientSocket, String response) {
+    public void writeResponseToRequest(ClientSocket clientSocket, byte[] response) {
         OutputStream output = clientSocket.getOutputStream();
-        PrintWriter writer = new PrintWriter(output);
-        writer.print(response);
-        writer.flush();
-        writer.close();
+        try {
+            output.write(response);
+            output.flush();
+            output.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public String readFromSocketStream(ClientSocket clientSocket) {
