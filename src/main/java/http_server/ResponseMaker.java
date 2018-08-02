@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import static http_server.HttpMethods.*;
 import static http_server.StatusCodes.METHOD_NOT_ALLOWED;
 import static http_server.StatusCodes.NOT_FOUND;
 import static http_server.StatusCodes.OK;
@@ -46,15 +47,15 @@ public class ResponseMaker {
     }
 
     public ByteArrayOutputStream buildWholeResponse(String request) {
-        String typeOfRequest = requestParser.extractMethodFromRequest(request);
+        HttpMethods typeOfRequest = requestParser.extractMethodFromRequest(request);
         String resourceRequested = requestParser.parseResource(request);
-        List<String> methodsRecognised = Arrays.asList("GET", "HEAD", "POST", "PUT", "DELETE", "CONNECT", "OPTIONS", "TRACE");
+        List<HttpMethods> methodsRecognised = Arrays.asList(GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, TRACE);
         if (methodsRecognised.contains(typeOfRequest)) {
             if (isHeadRequest(typeOfRequest)) {
                 return returnNoMessageBody(resourceRequested);
-            } else if (typeOfRequest.equals("OPTIONS")) {
+            } else if (typeOfRequest.equals(OPTIONS)) {
                 return optionsMessageBody(resourceRequested);
-            } else if (typeOfRequest.equals("POST")) {
+            } else if (typeOfRequest.equals(POST)) {
                 return postMessageBody(resourceRequested);
             } else {
                 return returnMessageBody(resourceRequested);
@@ -125,8 +126,8 @@ public class ResponseMaker {
         return resource.equals("/");
     }
 
-    private boolean isHeadRequest(String typeOfRequest) {
-        return typeOfRequest.equals("HEAD");
+    private boolean isHeadRequest(HttpMethods typeOfRequest) {
+        return typeOfRequest.equals(HEAD);
     }
 
     private ByteArrayOutputStream returnNoMessageBody(String resourceRequested) {

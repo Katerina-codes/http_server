@@ -3,6 +3,8 @@ package http_server;
 import org.junit.Before;
 import org.junit.Test;
 
+import static http_server.HttpMethods.GET;
+import static http_server.HttpMethods.HEAD;
 import static org.junit.Assert.assertEquals;
 
 public class RequestParserTest {
@@ -42,14 +44,14 @@ public class RequestParserTest {
     public void parseHeadMethodRequest() {
         String request = "HEAD / HTTP/1.1";
 
-        assertEquals("HEAD", requestParser.extractMethodFromRequest(request));
+        assertEquals(HEAD, requestParser.extractMethodFromRequest(request));
     }
 
     @Test
     public void parseGetMethodRequest() {
         String request = "GET /file1 HTTP/1.1";
 
-        assertEquals("GET", requestParser.extractMethodFromRequest(request));
+        assertEquals(GET, requestParser.extractMethodFromRequest(request));
     }
 
     @Test
