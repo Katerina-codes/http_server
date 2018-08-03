@@ -2,9 +2,6 @@ package http_server;
 
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.util.List;
-
-import static java.util.Arrays.asList;
 
 public class StartServer {
 
