@@ -7,7 +7,7 @@ import static java.util.Arrays.asList;
 
 public class RequestParser {
 
-    public static final int FROM_STARTING_INDEX = 0;
+    private static final int FROM_STARTING_INDEX = 0;
 
     public String parseResource(String request) {
         String rootDirectory = "/";
