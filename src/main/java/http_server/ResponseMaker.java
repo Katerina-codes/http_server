@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static http_server.Header.*;
+import static http_server.HttpMethods.GET;
 import static http_server.StatusCodes.*;
 import static java.util.Arrays.asList;
 
@@ -40,7 +41,9 @@ public class ResponseMaker {
         String resourceRequested = requestParser.parseResource(request);
         List<HttpMethods> httpMethods = Arrays.asList(HttpMethods.values());
 
-        if (httpMethods.contains(typeOfRequest)) {
+        if (requestIsToHomePage(resourceRequested) && typeOfRequest.equals(GET)) {
+            return returnHomeDirectoryContents(resourceRequested);
+        } else if (httpMethods.contains(typeOfRequest)) {
             ByteArrayOutputStream response = new ByteArrayOutputStream();
             for (HttpMethods method : httpMethods) {
                 if (method.equals(typeOfRequest)) {
@@ -67,7 +70,7 @@ public class ResponseMaker {
     }
 
     public String isResourceAvailable(String resource) {
-        if (fileReader.requestIsToHomePage(resource)) {
+        if (requestIsToHomePage(resource)) {
             return OK.getStatusCode();
         } else {
             if (fileReader.returnResourceContents(resource) != null) {
@@ -80,22 +83,6 @@ public class ResponseMaker {
 
     public String buildStatusLine(StatusCodes statusCode) {
         return HTTP_VERSION.getText() + statusCode.getStatusCode() + " " + statusCode.getStatusMessage();
-    }
-
-    public ByteArrayOutputStream optionsMessageBody(String resourceRequested) {
-        ByteArrayOutputStream outputStream = createOutputStream();
-        byte[] response = (
-                "" + buildStatusLine(OK) + NEW_LINE + CLOSE_CONNECTION.getText()
-        ).getBytes();
-
-        if (resourceRequested.equals("logs")) {
-            writeToOutputStream(outputStream, response);
-            writeToOutputStream(outputStream, METHODS_ALLOWED_FOR_LOGS.getText().getBytes());
-        } else {
-            writeToOutputStream(outputStream, response);
-            writeToOutputStream(outputStream, METHODS_ALLOWED_FOR_TXT_FILE.getText().getBytes());
-        }
-        return outputStream;
     }
 
     public ByteArrayOutputStream methodNotAllowed() {
@@ -119,6 +106,26 @@ public class ResponseMaker {
 
     public ByteArrayOutputStream createOutputStream() {
         return new ByteArrayOutputStream();
+    }
+
+    private ByteArrayOutputStream returnHomeDirectoryContents(String resourceRequested) {
+        byte[] fileContents = ("file1" + NEW_LINE +
+                "file2" + NEW_LINE +
+                "image.gif" + NEW_LINE +
+                "image.jpeg" + NEW_LINE +
+                "image.png" + NEW_LINE +
+                "partial_content.txt" + "\n" +
+                "patch-content.txt" + "\n" +
+                "text-file.txt").getBytes();
+        byte[] statusResponse = (statusResponse(resourceRequested) + BLANK_LINE).getBytes();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        writeToOutputStream(outputStream, statusResponse);
+        writeToOutputStream(outputStream, fileContents);
+        return outputStream;
+    }
+
+    private boolean requestIsToHomePage(String resource) {
+        return resource.equals("/");
     }
 
 }

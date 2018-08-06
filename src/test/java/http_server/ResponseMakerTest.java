@@ -70,6 +70,25 @@ public class ResponseMakerTest {
     }
 
     @Test
+    public void returnsListOfDirectoryContents() {
+        assertEquals(buildResponse(
+                HTTP_VERSION.getText(),
+                OK.getStatusCode(),
+                space,
+                OK.getStatusMessage()) + BLANK_LINE +
+                "file1" + NEW_LINE +
+                "file2" + NEW_LINE +
+                "image.gif" + NEW_LINE +
+                "image.jpeg" + NEW_LINE +
+                "image.png" + NEW_LINE +
+                "partial_content.txt" + "\n" +
+                "patch-content.txt" + "\n" +
+                "text-file.txt",
+
+        responseMaker.buildWholeResponse("GET / HTTP/1.1").toString());
+    }
+
+    @Test
     public void headRequestReturnsNoMessageBody() {
         assertEquals(buildResponse(
                 HTTP_VERSION.getText(),

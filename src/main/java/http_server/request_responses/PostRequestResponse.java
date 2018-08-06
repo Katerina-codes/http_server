@@ -12,7 +12,7 @@ public class PostRequestResponse implements RequestHandler {
     public ResponseMaker responseMaker = new  ResponseMaker();
 
     public ByteArrayOutputStream response(String resourceRequested) {
-        ByteArrayOutputStream optionsResponse = responseMaker.optionsMessageBody(resourceRequested);
+        ByteArrayOutputStream optionsResponse = new OptionsRequestResponse().response(resourceRequested);
         if (optionsResponse.toString().contains(POST.toString())) {
             responseMaker.writeToOutputStream(optionsResponse, "POST is not supported".getBytes());
             return optionsResponse;
