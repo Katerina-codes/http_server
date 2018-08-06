@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static http_server.Header.*;
-import static http_server.HttpMethods.*;
 import static http_server.StatusCodes.*;
 import static java.util.Arrays.asList;
 
@@ -39,17 +38,16 @@ public class ResponseMaker {
     public ByteArrayOutputStream buildWholeResponse(String request) {
         HttpMethods typeOfRequest = requestParser.extractMethodFromRequest(request);
         String resourceRequested = requestParser.parseResource(request);
-        List<HttpMethods> methodsRecognised = Arrays.asList(GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, TRACE);
-        if (methodsRecognised.contains(typeOfRequest)) {
-            if (isHeadRequest(typeOfRequest)) {
-                return returnNoMessageBody(resourceRequested);
-            } else if (typeOfRequest.equals(OPTIONS)) {
-                return optionsMessageBody(resourceRequested);
-            } else if (typeOfRequest.equals(POST)) {
-                return postMessageBody(resourceRequested);
-            } else {
-                return returnMessageBody(resourceRequested);
+        List<HttpMethods> httpMethods = Arrays.asList(HttpMethods.values());
+
+        if (httpMethods.contains(typeOfRequest)) {
+            ByteArrayOutputStream response = new ByteArrayOutputStream();
+            for (HttpMethods method : httpMethods) {
+                if (method.equals(typeOfRequest)) {
+                    response = method.getRequestHandler().response(resourceRequested);
+                }
             }
+            return response;
         } else {
             return methodNotAllowed();
         }
@@ -68,26 +66,7 @@ public class ResponseMaker {
         }
     }
 
-    private ByteArrayOutputStream returnMessageBody(String resourceRequested) {
-        ByteArrayOutputStream output = createOutputStream();
-        if (isResourceAvailable(resourceRequested).equals(NOT_FOUND.getStatusCode())) {
-            byte[] statusResponse = (statusResponse(resourceRequested) + "\n").getBytes();
-            writeToOutputStream(output, statusResponse);
-        } else {
-            byte[] fileContents = fileReader.returnResourceContents(resourceRequested);
-            String contentType = returnContentType(requestParser.parseContentType(resourceRequested));
-            byte[] statusResponse = (statusResponse(resourceRequested) + "\n").getBytes();
-            byte[] closeConnection = CLOSE_CONNECTION.getText().getBytes();
-            byte[] formatContentType = String.format("Content-Type: %s\n\n", contentType).getBytes();
-            writeToOutputStream(output, statusResponse);
-            writeToOutputStream(output, closeConnection);
-            writeToOutputStream(output, formatContentType);
-            writeToOutputStream(output, fileContents);
-        }
-        return output;
-    }
-
-    private String isResourceAvailable(String resource) {
+    public String isResourceAvailable(String resource) {
         if (fileReader.requestIsToHomePage(resource)) {
             return OK.getStatusCode();
         } else {
@@ -99,22 +78,11 @@ public class ResponseMaker {
         }
     }
 
-    private String buildStatusLine(StatusCodes statusCode) {
+    public String buildStatusLine(StatusCodes statusCode) {
         return HTTP_VERSION.getText() + statusCode.getStatusCode() + " " + statusCode.getStatusMessage();
     }
 
-    private boolean isHeadRequest(HttpMethods typeOfRequest) {
-        return typeOfRequest.equals(HEAD);
-    }
-
-    private ByteArrayOutputStream returnNoMessageBody(String resourceRequested) {
-        ByteArrayOutputStream output = createOutputStream();
-        byte[] response = (statusResponse(resourceRequested) + BLANK_LINE).getBytes();
-        writeToOutputStream(output, response);
-        return output;
-    }
-
-    private ByteArrayOutputStream optionsMessageBody(String resourceRequested) {
+    public ByteArrayOutputStream optionsMessageBody(String resourceRequested) {
         ByteArrayOutputStream outputStream = createOutputStream();
         byte[] response = (
                 "" + buildStatusLine(OK) + NEW_LINE + CLOSE_CONNECTION.getText()
@@ -130,34 +98,26 @@ public class ResponseMaker {
         return outputStream;
     }
 
-    private ByteArrayOutputStream postMessageBody(String resourceRequested) {
-        ByteArrayOutputStream optionsResponse = optionsMessageBody(resourceRequested);
-        if (optionsResponse.toString().contains(POST.toString())) {
-            writeToOutputStream(optionsResponse, "POST is not supported".getBytes());
-            return optionsResponse;
-        } else {
-            return methodNotAllowed();
-        }
-    }
-
-    private ByteArrayOutputStream methodNotAllowed() {
+    public ByteArrayOutputStream methodNotAllowed() {
         ByteArrayOutputStream outputStream = createOutputStream();
         byte[] bytes = (buildStatusLine(METHOD_NOT_ALLOWED) + "\n" +
+                CONTENT_LENGTH_ZERO.getText() +
                 CLOSE_CONNECTION.getText() +
                 METHODS_ALLOWED_FOR_TXT_FILE.getText()).getBytes();
         writeToOutputStream(outputStream, bytes);
         return outputStream;
     }
 
-    private void writeToOutputStream(ByteArrayOutputStream outputStream, byte[] bytes) {
+    public ByteArrayOutputStream writeToOutputStream(ByteArrayOutputStream outputStream, byte[] bytes) {
         try {
             outputStream.write(bytes);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return outputStream;
     }
 
-    private ByteArrayOutputStream createOutputStream() {
+    public ByteArrayOutputStream createOutputStream() {
         return new ByteArrayOutputStream();
     }
 

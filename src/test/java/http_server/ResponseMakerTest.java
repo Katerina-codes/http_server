@@ -114,6 +114,7 @@ public class ResponseMakerTest {
                 METHOD_NOT_ALLOWED.getStatusCode(),
                 space,
                 METHOD_NOT_ALLOWED.getStatusMessage()) + NEW_LINE +
+                CONTENT_LENGTH_ZERO.getText() +
                 CLOSE_CONNECTION.getText() +
                 METHODS_ALLOWED_FOR_TXT_FILE.getText(),
 
@@ -127,6 +128,7 @@ public class ResponseMakerTest {
                 METHOD_NOT_ALLOWED.getStatusCode(),
                 space,
                 METHOD_NOT_ALLOWED.getStatusMessage()) + NEW_LINE +
+                CONTENT_LENGTH_ZERO.getText() +
                 CLOSE_CONNECTION.getText() +
                 METHODS_ALLOWED_FOR_TXT_FILE.getText(),
 
