@@ -70,22 +70,24 @@ public class ResponseMakerTest {
     }
 
     @Test
-    public void returnsListOfDirectoryContents() {
+    public void getRequestReturnsListOfDirectoryContentsWithLinks() {
         assertEquals(buildResponse(
                 HTTP_VERSION.getText(),
                 OK.getStatusCode(),
                 space,
-                OK.getStatusMessage()) + BLANK_LINE +
-                "file1" + NEW_LINE +
-                "file2" + NEW_LINE +
-                "image.gif" + NEW_LINE +
-                "image.jpeg" + NEW_LINE +
-                "image.png" + NEW_LINE +
-                "partial_content.txt" + "\n" +
-                "patch-content.txt" + "\n" +
-                "text-file.txt",
-
-        responseMaker.buildWholeResponse("GET / HTTP/1.1").toString());
+                OK.getStatusMessage()) + NEW_LINE +
+                CONTENT_TYPE.getText() + "text/html" + BLANK_LINE +
+                        "<html><head></head><body>" +
+                        "<a href=\"/file1\">" + "file1" + "</a><br>" +
+                        "<a href=\"/file2\">" + "file2" + "</a><br>" +
+                        "<a href=\"/image.gif\">" + "image.gif" + "</a><br>" +
+                        "<a href=\"/image.jpeg\">" + "image.jpeg" + "</a><br>" +
+                        "<a href=\"/image.png\">" + "image.png" + "</a><br>" +
+                        "<a href=\"/partial_content.txt\">" + "partial_content.txt" + "</a><br>" +
+                        "<a href=\"/patch-content.txt\">" + "patch-content.txt" + "</a><br>" +
+                        "<a href=\"/text-file.txt\">" + "text-file.txt" + "</a>" +
+                        "</body></html>",
+                responseMaker.buildWholeResponse("GET / HTTP/1.1").toString());
     }
 
     @Test
