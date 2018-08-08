@@ -2,13 +2,13 @@ package http_server;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static http_server.Header.*;
 import static http_server.HttpMethods.GET;
 import static http_server.StatusCodes.*;
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 
 public class ResponseMaker {
 
@@ -21,6 +21,8 @@ public class ResponseMaker {
     public static final String TEXT = "txt";
     public static final String JPEG = "jpeg";
     public static final String PNG = "png";
+    public static final String TEXT_HTML = "text/html";
+    public static final String SPACE = " ";
     private RequestParser requestParser = new RequestParser();
     private FileReader fileReader = new FileReader();
 
@@ -82,7 +84,7 @@ public class ResponseMaker {
     }
 
     public String buildStatusLine(StatusCodes statusCode) {
-        return HTTP_VERSION.getText() + statusCode.getStatusCode() + " " + statusCode.getStatusMessage();
+        return HTTP_VERSION.getText() + statusCode.getStatusCode() + SPACE + statusCode.getStatusMessage();
     }
 
     public ByteArrayOutputStream methodNotAllowed() {
@@ -109,23 +111,41 @@ public class ResponseMaker {
     }
 
     private ByteArrayOutputStream returnHomeDirectoryContents(String resourceRequested) {
-        byte[] fileContents = (
-                "<html><head></head><body>" +
-                        "<a href=\"/file1\">" + "file1" + "</a><br>" +
-                        "<a href=\"/file2\">" + "file2" + "</a><br>" +
-                        "<a href=\"/image.gif\">" + "image.gif" + "</a><br>" +
-                        "<a href=\"/image.jpeg\">" + "image.jpeg" + "</a><br>" +
-                        "<a href=\"/image.png\">" + "image.png" + "</a><br>" +
-                        "<a href=\"/partial_content.txt\">" + "partial_content.txt" + "</a><br>" +
-                        "<a href=\"/patch-content.txt\">" + "patch-content.txt" + "</a><br>" +
-                        "<a href=\"/text-file.txt\">" + "text-file.txt" + "</a>" +
-                        "</body></html>").getBytes();
-        byte[] statusResponse = (statusResponse(resourceRequested) + NEW_LINE +
-                "Content-Type: text/html" + NEW_LINE + NEW_LINE).getBytes();
+        List<String> files = emptyList();
+        files = getDirectoryContents(files);
+        String directoryContents = getFileNames(files);
+        byte[] statusResponse = buildDirectoryResponse(resourceRequested);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         writeToOutputStream(outputStream, statusResponse);
-        writeToOutputStream(outputStream, fileContents);
+        writeToOutputStream(outputStream, directoryContents.getBytes());
         return outputStream;
+    }
+
+    private byte[] buildDirectoryResponse(String resourceRequested) {
+        return (statusResponse(resourceRequested) + NEW_LINE +
+                    CONTENT_TYPE.getText() + TEXT_HTML + NEW_LINE + NEW_LINE).getBytes();
+    }
+
+    private List<String> getDirectoryContents(List<String> files) {
+        try {
+            files = fileReader.returnDirectoryContents("public/");
+        } catch (DirectoryNotFoundException e) {
+            e.printStackTrace();
+        }
+        return files;
+    }
+
+    private String getFileNames(List<String> files) {
+        String directoryContents = "<html><head></head><body>";
+        for (String file : files) {
+            directoryContents = directoryContents.concat(buildLink(file));
+        }
+        directoryContents = directoryContents.concat("</body></html>");
+        return directoryContents;
+    }
+
+    private String buildLink(String filePath) {
+        return "<a href=\"/" + filePath + "\">" + filePath + "</a><br>";
     }
 
     private boolean requestIsToHomePage(String resource) {

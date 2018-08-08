@@ -10,7 +10,6 @@ import static org.junit.Assert.assertEquals;
 
 public class ResponseMakerTest {
 
-    private String space = " ";
     private ResponseMaker responseMaker;
 
     @Before
@@ -27,7 +26,7 @@ public class ResponseMakerTest {
         assertEquals(buildResponse(
                 HTTP_VERSION.getText(),
                 OK.getStatusCode(),
-                space,
+                SPACE,
                 OK.getStatusMessage()),
 
                 responseMaker.statusResponse("file1"));
@@ -38,7 +37,7 @@ public class ResponseMakerTest {
         assertEquals(buildResponse(
                 HTTP_VERSION.getText(),
                 OK.getStatusCode(),
-                space,
+                SPACE,
                 OK.getStatusMessage()) + NEW_LINE +
                 CLOSE_CONNECTION.getText() +
                 CONTENT_TYPE.getText() + TEXT_PLAIN + BLANK_LINE +
@@ -52,7 +51,7 @@ public class ResponseMakerTest {
        assertEquals(buildResponse(
                HTTP_VERSION.getText(),
                NOT_FOUND.getStatusCode(),
-               space,
+               SPACE,
                NOT_FOUND.getStatusMessage()) + NEW_LINE,
 
                responseMaker.buildWholeResponse("GET /no_file_here.txt HTTP/1.1").toString());
@@ -63,7 +62,7 @@ public class ResponseMakerTest {
         assertEquals(buildResponse(
                 HTTP_VERSION.getText(),
                 OK.getStatusCode(),
-                space,
+                SPACE,
                 OK.getStatusMessage()),
 
                 responseMaker.statusResponse("/"));
@@ -74,7 +73,7 @@ public class ResponseMakerTest {
         assertEquals(buildResponse(
                 HTTP_VERSION.getText(),
                 OK.getStatusCode(),
-                space,
+                SPACE,
                 OK.getStatusMessage()) + NEW_LINE +
                 CONTENT_TYPE.getText() + "text/html" + BLANK_LINE +
                         "<html><head></head><body>" +
@@ -85,7 +84,7 @@ public class ResponseMakerTest {
                         "<a href=\"/image.png\">" + "image.png" + "</a><br>" +
                         "<a href=\"/partial_content.txt\">" + "partial_content.txt" + "</a><br>" +
                         "<a href=\"/patch-content.txt\">" + "patch-content.txt" + "</a><br>" +
-                        "<a href=\"/text-file.txt\">" + "text-file.txt" + "</a>" +
+                        "<a href=\"/text-file.txt\">" + "text-file.txt" + "</a><br>" +
                         "</body></html>",
                 responseMaker.buildWholeResponse("GET / HTTP/1.1").toString());
     }
@@ -95,7 +94,7 @@ public class ResponseMakerTest {
         assertEquals(buildResponse(
                 HTTP_VERSION.getText(),
                 OK.getStatusCode(),
-                space,
+                SPACE,
                 OK.getStatusMessage()) +
                         BLANK_LINE,
 
@@ -107,7 +106,7 @@ public class ResponseMakerTest {
        assertEquals(buildResponse(
                HTTP_VERSION.getText(),
                OK.getStatusCode(),
-               space,
+               SPACE,
                OK.getStatusMessage()) + NEW_LINE +
                CLOSE_CONNECTION.getText() +
                METHODS_ALLOWED_FOR_TXT_FILE.getText(),
@@ -120,7 +119,7 @@ public class ResponseMakerTest {
         assertEquals(buildResponse(
                 HTTP_VERSION.getText(),
                 OK.getStatusCode(),
-                space,
+                SPACE,
                 OK.getStatusMessage()) + NEW_LINE +
                 CLOSE_CONNECTION.getText() +
                 METHODS_ALLOWED_FOR_LOGS.getText(),
@@ -133,7 +132,7 @@ public class ResponseMakerTest {
         assertEquals(buildResponse(
                 HTTP_VERSION.getText(),
                 METHOD_NOT_ALLOWED.getStatusCode(),
-                space,
+                SPACE,
                 METHOD_NOT_ALLOWED.getStatusMessage()) + NEW_LINE +
                 CONTENT_LENGTH_ZERO.getText() +
                 CLOSE_CONNECTION.getText() +
@@ -147,7 +146,7 @@ public class ResponseMakerTest {
         assertEquals(buildResponse(
                 HTTP_VERSION.getText(),
                 METHOD_NOT_ALLOWED.getStatusCode(),
-                space,
+                SPACE,
                 METHOD_NOT_ALLOWED.getStatusMessage()) + NEW_LINE +
                 CONTENT_LENGTH_ZERO.getText() +
                 CLOSE_CONNECTION.getText() +
