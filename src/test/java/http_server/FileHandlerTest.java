@@ -1,15 +1,31 @@
 package http_server;
 
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
+import java.io.IOException;
 import java.util.List;
 
 import static java.util.Arrays.asList;
-import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 
 public class FileHandlerTest {
+
+    private FileHandler fileHandler;
+    private String directoryPath;
+    private final String dummyFilePath = "dummyFile.txt";
+
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+    @Before
+    public void setUp() {
+         fileHandler = new FileHandler();
+         directoryPath = temporaryFolder.getRoot().getPath();
+    }
 
     @Test
     public void returnsContentsOfFileOne() {
@@ -36,23 +52,17 @@ public class FileHandlerTest {
 
     @Test
     public void createsNewFile() throws DirectoryNotFoundException {
-        FileHandler fileHandler = new FileHandler();
-        String directoryPath = "src/test/java/http_server/DummyDirectory/";
+        fileHandler.createFile(directoryPath, dummyFilePath);
 
-        fileHandler.createFile(directoryPath, "dummyFile.txt");
-
-        assertTrue(fileHandler.returnDirectoryContents(directoryPath).size() == 1);
+        assertEquals(1, fileHandler.returnDirectoryContents(directoryPath).size());
     }
 
     @Test
     public void deleteFile() throws DirectoryNotFoundException {
-        FileHandler fileHandler = new FileHandler();
-        String directoryPath = "src/test/java/http_server/DummyDirectory/";
+        fileHandler.createFile(directoryPath, dummyFilePath);
+        fileHandler.deleteFile(directoryPath, dummyFilePath);
 
-        fileHandler.createFile(directoryPath, "dummyFile.txt");
-        fileHandler.deleteFile(directoryPath, "dummyFile.txt");
-
-        assertTrue(fileHandler.returnDirectoryContents(directoryPath).size() == 0);
+        assertEquals(0, fileHandler.returnDirectoryContents(directoryPath).size());
     }
 
 }

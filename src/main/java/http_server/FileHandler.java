@@ -63,9 +63,8 @@ public class FileHandler {
     }
 
     public void createFile(String path, String file) {
-        Path pathToNewFile = Paths.get(path + file);
+        Path pathToNewFile = Paths.get(path + "/" + file);
         try {
-            Files.createDirectories(pathToNewFile.getParent());
             Files.createFile(pathToNewFile);
         } catch (IOException e) {
             e.printStackTrace();
@@ -73,7 +72,7 @@ public class FileHandler {
     }
 
     public void deleteFile(String directoryPath, String fileToDelete) {
-        File file = new File(directoryPath + fileToDelete);
+        File file = new File(directoryPath + "/" + fileToDelete);
         file.delete();
     }
 
