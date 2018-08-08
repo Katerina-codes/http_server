@@ -7,7 +7,7 @@ public enum HttpMethods {
     HEAD(new HeadRequestResponse()),
     POST(new PostRequestResponse()),
     PUT(new PutRequestResponse()),
-    DELETE(new FakeResponse()),
+    DELETE(new DeleteRequestResponse()),
     CONNECT(new FakeResponse()),
     OPTIONS(new OptionsRequestResponse()),
     TRACE(new FakeResponse());

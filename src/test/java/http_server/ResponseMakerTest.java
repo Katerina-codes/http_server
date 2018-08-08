@@ -158,7 +158,8 @@ public class ResponseMakerTest {
 
     @Test
     public void putRequestCreatesNewFile() {
-        assertEquals(buildResponse(HTTP_VERSION.getText(),
+        assertEquals(buildResponse(
+                HTTP_VERSION.getText(),
                 CREATED.getStatusCode(),
                 SPACE,
                 CREATED.getStatusMessage()),
@@ -166,6 +167,18 @@ public class ResponseMakerTest {
                 responseMaker.buildWholeResponse("PUT /new_file.txt HTTP/1.1").toString());
                 FileHandler fileHandler = new FileHandler();
                 fileHandler.deleteFile("public/", "new_file.txt");
+    }
+
+    @Test
+    public void deleteRequestDeletesFile() {
+        assertEquals(buildResponse(
+                HTTP_VERSION.getText(),
+                OK.getStatusCode(),
+                SPACE,
+                OK.getStatusMessage()),
+
+
+                responseMaker.buildWholeResponse("DELETE /new_file.txt HTTP/1.1").toString());
     }
 
     @Test
