@@ -11,7 +11,7 @@ import java.util.List;
 import static java.util.Arrays.asList;
 import static java.util.Collections.*;
 
-public class FileReader {
+public class FileHandler {
 
     public byte[] returnResourceContents(String resource) {
         byte[] contents = null;
@@ -60,6 +60,21 @@ public class FileReader {
             extractedFileNames.add(fileName);
         }
         return extractedFileNames;
+    }
+
+    public void createFile(String path, String file) {
+        Path pathToNewFile = Paths.get(path + file);
+        try {
+            Files.createDirectories(pathToNewFile.getParent());
+            Files.createFile(pathToNewFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteFile(String directoryPath, String fileToDelete) {
+        File file = new File(directoryPath + fileToDelete);
+        file.delete();
     }
 
 }
