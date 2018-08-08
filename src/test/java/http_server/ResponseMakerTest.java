@@ -46,16 +46,16 @@ public class ResponseMakerTest {
                 responseMaker.buildWholeResponse("GET /file1 HTTP/1.1").toString());
     }
 
-   @Test
-   public void returnsFourOhFourIfFileNotFoundFromRequest() {
-       assertEquals(buildResponse(
-               HTTP_VERSION.getText(),
-               NOT_FOUND.getStatusCode(),
-               SPACE,
-               NOT_FOUND.getStatusMessage()) + NEW_LINE,
+    @Test
+    public void returnsFourOhFourIfFileNotFoundFromRequest() {
+        assertEquals(buildResponse(
+                HTTP_VERSION.getText(),
+                NOT_FOUND.getStatusCode(),
+                SPACE,
+                NOT_FOUND.getStatusMessage()) + NEW_LINE,
 
-               responseMaker.buildWholeResponse("GET /no_file_here.txt HTTP/1.1").toString());
-   }
+                responseMaker.buildWholeResponse("GET /no_file_here.txt HTTP/1.1").toString());
+    }
 
     @Test
     public void returnStatusOfOkIfResourceExistsButIsEmpty() {
@@ -76,16 +76,17 @@ public class ResponseMakerTest {
                 SPACE,
                 OK.getStatusMessage()) + NEW_LINE +
                 CONTENT_TYPE.getText() + "text/html" + BLANK_LINE +
-                        "<html><head></head><body>" +
-                        "<a href=\"/file1\">" + "file1" + "</a><br>" +
-                        "<a href=\"/file2\">" + "file2" + "</a><br>" +
-                        "<a href=\"/image.gif\">" + "image.gif" + "</a><br>" +
-                        "<a href=\"/image.jpeg\">" + "image.jpeg" + "</a><br>" +
-                        "<a href=\"/image.png\">" + "image.png" + "</a><br>" +
-                        "<a href=\"/partial_content.txt\">" + "partial_content.txt" + "</a><br>" +
-                        "<a href=\"/patch-content.txt\">" + "patch-content.txt" + "</a><br>" +
-                        "<a href=\"/text-file.txt\">" + "text-file.txt" + "</a><br>" +
-                        "</body></html>",
+                "<html><head></head><body>" +
+                "<a href=\"/file1\">" + "file1" + "</a><br>" +
+                "<a href=\"/file2\">" + "file2" + "</a><br>" +
+                "<a href=\"/image.gif\">" + "image.gif" + "</a><br>" +
+                "<a href=\"/image.jpeg\">" + "image.jpeg" + "</a><br>" +
+                "<a href=\"/image.png\">" + "image.png" + "</a><br>" +
+                "<a href=\"/partial_content.txt\">" + "partial_content.txt" + "</a><br>" +
+                "<a href=\"/patch-content.txt\">" + "patch-content.txt" + "</a><br>" +
+                "<a href=\"/text-file.txt\">" + "text-file.txt" + "</a><br>" +
+                "</body></html>",
+
                 responseMaker.buildWholeResponse("GET / HTTP/1.1").toString());
     }
 
@@ -96,22 +97,22 @@ public class ResponseMakerTest {
                 OK.getStatusCode(),
                 SPACE,
                 OK.getStatusMessage()) +
-                        BLANK_LINE,
+                BLANK_LINE,
 
                 responseMaker.buildWholeResponse("HEAD / HTTP/1.1").toString());
     }
 
     @Test
     public void responseToOptionsRequestContainsMethodsItSupports() {
-       assertEquals(buildResponse(
-               HTTP_VERSION.getText(),
-               OK.getStatusCode(),
-               SPACE,
-               OK.getStatusMessage()) + NEW_LINE +
-               CLOSE_CONNECTION.getText() +
-               METHODS_ALLOWED_FOR_TXT_FILE.getText(),
+        assertEquals(buildResponse(
+                HTTP_VERSION.getText(),
+                OK.getStatusCode(),
+                SPACE,
+                OK.getStatusMessage()) + NEW_LINE +
+                CLOSE_CONNECTION.getText() +
+                METHODS_ALLOWED_FOR_TXT_FILE.getText(),
 
-               responseMaker.buildWholeResponse("OPTIONS /file1 HTTP/1.1").toString());
+                responseMaker.buildWholeResponse("OPTIONS /file1 HTTP/1.1").toString());
     }
 
     @Test
@@ -121,8 +122,8 @@ public class ResponseMakerTest {
                 OK.getStatusCode(),
                 SPACE,
                 OK.getStatusMessage()) + NEW_LINE +
-                CLOSE_CONNECTION.getText() +
-                METHODS_ALLOWED_FOR_LOGS.getText(),
+                        CLOSE_CONNECTION.getText() +
+                        METHODS_ALLOWED_FOR_LOGS.getText(),
 
                 responseMaker.buildWholeResponse("OPTIONS /logs HTTP/1.1").toString());
     }
@@ -153,6 +154,18 @@ public class ResponseMakerTest {
                 METHODS_ALLOWED_FOR_TXT_FILE.getText(),
 
                 responseMaker.buildWholeResponse("RPZFEAXH /file1 HTTP/1.1").toString());
+    }
+
+    @Test
+    public void putRequestCreatesNewFile() {
+        assertEquals(buildResponse(HTTP_VERSION.getText(),
+                CREATED.getStatusCode(),
+                SPACE,
+                CREATED.getStatusMessage()),
+
+                responseMaker.buildWholeResponse("PUT /new_file.txt HTTP/1.1").toString());
+                FileHandler fileHandler = new FileHandler();
+                fileHandler.deleteFile("public/", "new_file.txt");
     }
 
     @Test

@@ -24,7 +24,7 @@ public class ResponseMaker {
     public static final String TEXT_HTML = "text/html";
     public static final String SPACE = " ";
     private RequestParser requestParser = new RequestParser();
-    private FileReader fileReader = new FileReader();
+    private FileHandler fileHandler = new FileHandler();
 
     public String statusResponse(String file) {
         String statusCodeForResource = isResourceAvailable(file);
@@ -46,13 +46,7 @@ public class ResponseMaker {
         if (requestIsToHomePage(resourceRequested) && typeOfRequest.equals(GET)) {
             return returnHomeDirectoryContents(resourceRequested);
         } else if (httpMethods.contains(typeOfRequest)) {
-            ByteArrayOutputStream response = new ByteArrayOutputStream();
-            for (HttpMethods method : httpMethods) {
-                if (method.equals(typeOfRequest)) {
-                    response = method.getRequestHandler().response(resourceRequested);
-                }
-            }
-            return response;
+            return respondToRequest(typeOfRequest, resourceRequested, httpMethods);
         } else {
             return methodNotAllowed();
         }
@@ -75,7 +69,7 @@ public class ResponseMaker {
         if (requestIsToHomePage(resource)) {
             return OK.getStatusCode();
         } else {
-            if (fileReader.returnResourceContents(resource) != null) {
+            if (fileHandler.returnResourceContents(resource) != null) {
                 return OK.getStatusCode();
             } else {
                 return NOT_FOUND.getStatusCode();
@@ -128,13 +122,22 @@ public class ResponseMaker {
 
     private List<String> getDirectoryContents(List<String> files) {
         try {
-            files = fileReader.returnDirectoryContents("public/");
+            files = fileHandler.returnDirectoryContents("public/");
         } catch (DirectoryNotFoundException e) {
             e.printStackTrace();
         }
         return files;
     }
 
+    private ByteArrayOutputStream respondToRequest(HttpMethods typeOfRequest, String resourceRequested, List<HttpMethods> httpMethods) {
+        ByteArrayOutputStream response = new ByteArrayOutputStream();
+        for (HttpMethods method : httpMethods) {
+            if (method.equals(typeOfRequest)) {
+                response = method.getRequestHandler().response(resourceRequested);
+            }
+        }
+        return response;
+    }
     private String getFileNames(List<String> files) {
         String directoryContents = "<html><head></head><body>";
         for (String file : files) {
