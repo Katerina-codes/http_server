@@ -3,7 +3,6 @@ package http_server;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -46,7 +45,7 @@ public class FileHandlerTest {
     }
 
     @Test
-    public void deleteFile() throws DirectoryNotFoundException, IOException {
+    public void deleteFile() throws DirectoryNotFoundException {
         FileHandler fileHandler = new FileHandler();
         String directoryPath = "src/test/java/http_server/DummyDirectory/";
 

@@ -5,15 +5,13 @@ import http_server.ResponseMaker;
 
 import java.io.ByteArrayOutputStream;
 
-import static http_server.Header.CLOSE_CONNECTION;
-import static http_server.Header.METHODS_ALLOWED_FOR_LOGS;
-import static http_server.Header.METHODS_ALLOWED_FOR_TXT_FILE;
+import static http_server.Header.*;
 import static http_server.ResponseMaker.NEW_LINE;
 import static http_server.StatusCodes.OK;
 
 public class OptionsRequestResponse implements RequestHandler {
 
-    public ResponseMaker responseMaker = new  ResponseMaker();
+    public ResponseMaker responseMaker = new ResponseMaker();
 
     public ByteArrayOutputStream response(String resourceRequested) {
         ByteArrayOutputStream outputStream = responseMaker.createOutputStream();

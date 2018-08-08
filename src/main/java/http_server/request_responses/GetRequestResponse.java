@@ -12,7 +12,7 @@ import static http_server.StatusCodes.NOT_FOUND;
 
 public class GetRequestResponse implements RequestHandler {
 
-    public ResponseMaker responseMaker = new  ResponseMaker();
+    public ResponseMaker responseMaker = new ResponseMaker();
     private FileHandler fileHandler = new FileHandler();
     private RequestParser requestParser = new RequestParser();
 

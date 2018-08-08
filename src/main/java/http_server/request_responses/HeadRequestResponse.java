@@ -9,7 +9,7 @@ import static http_server.ResponseMaker.BLANK_LINE;
 
 public class HeadRequestResponse implements RequestHandler {
 
-    public ResponseMaker responseMaker = new  ResponseMaker();
+    public ResponseMaker responseMaker = new ResponseMaker();
 
     public ByteArrayOutputStream response(String resourceRequested) {
         ByteArrayOutputStream output = responseMaker.createOutputStream();

@@ -8,8 +8,8 @@ import java.io.ByteArrayOutputStream;
 
 import static http_server.Header.CLOSE_CONNECTION;
 import static http_server.Header.CONTENT_TYPE;
-import static http_server.ResponseMaker.TEXT_PLAIN;
 import static http_server.ResponseMaker.BLANK_LINE;
+import static http_server.ResponseMaker.TEXT_PLAIN;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 
@@ -81,9 +81,9 @@ public class ServerTest {
         serverSpy.run(serverSocketSpy);
 
         assertEquals("HTTP/1.1 200 OK\n" +
-                CLOSE_CONNECTION.getText() +
-                CONTENT_TYPE.getText() + TEXT_PLAIN + BLANK_LINE +
-                "file1 contents",
+                        CLOSE_CONNECTION.getText() +
+                        CONTENT_TYPE.getText() + TEXT_PLAIN + BLANK_LINE +
+                        "file1 contents",
 
                 clientSocketSpy.getOutputStreamContents());
     }

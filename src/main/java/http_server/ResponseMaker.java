@@ -2,7 +2,8 @@ package http_server;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 
 import static http_server.Header.*;
 import static http_server.HttpMethods.GET;
@@ -117,7 +118,7 @@ public class ResponseMaker {
 
     private byte[] buildDirectoryResponse(String resourceRequested) {
         return (statusResponse(resourceRequested) + NEW_LINE +
-                    CONTENT_TYPE.getText() + TEXT_HTML + NEW_LINE + NEW_LINE).getBytes();
+                CONTENT_TYPE.getText() + TEXT_HTML + NEW_LINE + NEW_LINE).getBytes();
     }
 
     private List<String> getDirectoryContents(List<String> files) {
@@ -138,6 +139,7 @@ public class ResponseMaker {
         }
         return response;
     }
+
     private String getFileNames(List<String> files) {
         String directoryContents = "<html><head></head><body>";
         for (String file : files) {

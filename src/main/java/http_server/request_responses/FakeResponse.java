@@ -7,7 +7,7 @@ import java.io.ByteArrayOutputStream;
 
 public class FakeResponse implements RequestHandler {
 
-    public ResponseMaker responseMaker = new  ResponseMaker();
+    public ResponseMaker responseMaker = new ResponseMaker();
 
     public ByteArrayOutputStream response(String resourceRequested) {
         return responseMaker.methodNotAllowed();

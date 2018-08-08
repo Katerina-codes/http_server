@@ -9,7 +9,7 @@ import static http_server.HttpMethods.POST;
 
 public class PostRequestResponse implements RequestHandler {
 
-    public ResponseMaker responseMaker = new  ResponseMaker();
+    public ResponseMaker responseMaker = new ResponseMaker();
 
     public ByteArrayOutputStream response(String resourceRequested) {
         ByteArrayOutputStream optionsResponse = new OptionsRequestResponse().response(resourceRequested);
