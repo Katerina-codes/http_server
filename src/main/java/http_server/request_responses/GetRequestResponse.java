@@ -22,17 +22,21 @@ public class GetRequestResponse implements RequestHandler {
             byte[] statusResponse = (responseMaker.statusResponse(resourceRequested) + "\n").getBytes();
             output = responseMaker.writeToOutputStream(output, statusResponse);
         } else {
-            byte[] fileContents = fileHandler.returnResourceContents(resourceRequested);
-            String contentType = responseMaker.returnContentType(requestParser.parseContentType(resourceRequested));
-            byte[] statusResponse = (responseMaker.statusResponse(resourceRequested) + "\n").getBytes();
-            byte[] closeConnection = CLOSE_CONNECTION.getText().getBytes();
-            byte[] formatContentType = String.format("Content-Type: %s\n\n", contentType).getBytes();
-            responseMaker.writeToOutputStream(output, statusResponse);
-            responseMaker.writeToOutputStream(output, closeConnection);
-            responseMaker.writeToOutputStream(output, formatContentType);
-            responseMaker.writeToOutputStream(output, fileContents);
+            returnFileContents(resourceRequested, output);
         }
         return output;
+    }
+
+    private void returnFileContents(String resourceRequested, ByteArrayOutputStream output) {
+        byte[] fileContents = fileHandler.returnResourceContents(resourceRequested);
+        String contentType = responseMaker.returnContentType(requestParser.parseContentType(resourceRequested));
+        byte[] statusResponse = (responseMaker.statusResponse(resourceRequested) + "\n").getBytes();
+        byte[] closeConnection = CLOSE_CONNECTION.getText().getBytes();
+        byte[] formatContentType = String.format("Content-Type: %s\n\n", contentType).getBytes();
+        responseMaker.writeToOutputStream(output, statusResponse);
+        responseMaker.writeToOutputStream(output, closeConnection);
+        responseMaker.writeToOutputStream(output, formatContentType);
+        responseMaker.writeToOutputStream(output, fileContents);
     }
 
     private boolean resourceIsNotAvailable(String resourceRequested) {
