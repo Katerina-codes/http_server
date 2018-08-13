@@ -35,6 +35,20 @@ public class FileHandler {
         } else throw new DirectoryNotFoundException();
     }
 
+    public void createFile(String path, String file) {
+        Path pathToNewFile = Paths.get(path + "/" + file);
+        try {
+            Files.createFile(pathToNewFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteFile(String directoryPath, String fileToDelete) {
+        File file = new File(directoryPath + "/" + fileToDelete);
+        file.delete();
+    }
+
     private List<File> getFiles(Path directoryPath) {
         File directory = new File(directoryPath.toString());
         File[] listOfFiles = directory.listFiles();
@@ -60,20 +74,6 @@ public class FileHandler {
             extractedFileNames.add(fileName);
         }
         return extractedFileNames;
-    }
-
-    public void createFile(String path, String file) {
-        Path pathToNewFile = Paths.get(path + "/" + file);
-        try {
-            Files.createFile(pathToNewFile);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void deleteFile(String directoryPath, String fileToDelete) {
-        File file = new File(directoryPath + "/" + fileToDelete);
-        file.delete();
     }
 
 }
