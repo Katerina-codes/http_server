@@ -70,7 +70,7 @@ public class ResponseMaker {
         if (requestIsToHomePage(resource)) {
             return OK.getStatusCode();
         } else {
-            if (fileHandler.returnResourceContents(resource) != null) {
+            if (fileHandler.returnResourceContents(resource).length != 0) {
                 return OK.getStatusCode();
             } else {
                 return NOT_FOUND.getStatusCode();

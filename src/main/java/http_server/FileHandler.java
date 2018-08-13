@@ -14,7 +14,7 @@ import static java.util.Collections.emptyList;
 public class FileHandler {
 
     public byte[] returnResourceContents(String resource) {
-        byte[] contents = null;
+        byte[] contents = new byte[0];
         String filePath = String.format("public/%s", resource);
         try {
             Path path = Paths.get(filePath);

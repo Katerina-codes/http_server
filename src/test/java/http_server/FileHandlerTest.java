@@ -6,7 +6,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import java.io.IOException;
 import java.util.List;
 
 import static java.util.Arrays.asList;
@@ -63,6 +62,12 @@ public class FileHandlerTest {
         fileHandler.deleteFile(directoryPath, dummyFilePath);
 
         assertEquals(0, fileHandler.returnDirectoryContents(directoryPath).size());
+    }
+
+    @Test
+    public void returnsEmptyByteArrayInsteadOfNull() {
+
+        Assert.assertArrayEquals(new byte[0], fileHandler.returnResourceContents("fake_file.txt"));
     }
 
 }
