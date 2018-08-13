@@ -22,8 +22,8 @@ public class FileHandlerTest {
 
     @Before
     public void setUp() {
-         fileHandler = new FileHandler();
-         directoryPath = temporaryFolder.getRoot().getPath();
+        fileHandler = new FileHandler();
+        directoryPath = temporaryFolder.getRoot().getPath();
     }
 
     @Test
