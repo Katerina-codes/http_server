@@ -6,9 +6,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import static http_server.Header.*;
-import static http_server.HttpMethods.*;
+import static http_server.HttpMethods.GET;
 import static http_server.StatusCodes.*;
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 
 public class ResponseMaker {
 
@@ -21,8 +22,10 @@ public class ResponseMaker {
     public static final String TEXT = "txt";
     public static final String JPEG = "jpeg";
     public static final String PNG = "png";
+    public static final String TEXT_HTML = "text/html";
+    public static final String SPACE = " ";
     private RequestParser requestParser = new RequestParser();
-    private FileReader fileReader = new FileReader();
+    private FileHandler fileHandler = new FileHandler();
 
     public String statusResponse(String file) {
         String statusCodeForResource = isResourceAvailable(file);
@@ -39,17 +42,12 @@ public class ResponseMaker {
     public ByteArrayOutputStream buildWholeResponse(String request) {
         HttpMethods typeOfRequest = requestParser.extractMethodFromRequest(request);
         String resourceRequested = requestParser.parseResource(request);
-        List<HttpMethods> methodsRecognised = Arrays.asList(GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, TRACE);
-        if (methodsRecognised.contains(typeOfRequest)) {
-            if (isHeadRequest(typeOfRequest)) {
-                return returnNoMessageBody(resourceRequested);
-            } else if (typeOfRequest.equals(OPTIONS)) {
-                return optionsMessageBody(resourceRequested);
-            } else if (typeOfRequest.equals(POST)) {
-                return postMessageBody(resourceRequested);
-            } else {
-                return returnMessageBody(resourceRequested);
-            }
+        List<HttpMethods> httpMethods = Arrays.asList(HttpMethods.values());
+
+        if (requestIsToHomePage(resourceRequested) && typeOfRequest.equals(GET)) {
+            return returnHomeDirectoryContents(resourceRequested);
+        } else if (httpMethods.contains(typeOfRequest)) {
+            return respondToRequest(typeOfRequest, resourceRequested, httpMethods);
         } else {
             return methodNotAllowed();
         }
@@ -68,30 +66,11 @@ public class ResponseMaker {
         }
     }
 
-    private ByteArrayOutputStream returnMessageBody(String resourceRequested) {
-        ByteArrayOutputStream output = createOutputStream();
-        if (isResourceAvailable(resourceRequested).equals(NOT_FOUND.getStatusCode())) {
-            byte[] statusResponse = (statusResponse(resourceRequested) + "\n").getBytes();
-            writeToOutputStream(output, statusResponse);
-        } else {
-            byte[] fileContents = fileReader.returnResourceContents(resourceRequested);
-            String contentType = returnContentType(requestParser.parseContentType(resourceRequested));
-            byte[] statusResponse = (statusResponse(resourceRequested) + "\n").getBytes();
-            byte[] closeConnection = CLOSE_CONNECTION.getText().getBytes();
-            byte[] formatContentType = String.format("Content-Type: %s\n\n", contentType).getBytes();
-            writeToOutputStream(output, statusResponse);
-            writeToOutputStream(output, closeConnection);
-            writeToOutputStream(output, formatContentType);
-            writeToOutputStream(output, fileContents);
-        }
-        return output;
-    }
-
-    private String isResourceAvailable(String resource) {
-        if (fileReader.requestIsToHomePage(resource)) {
+    public String isResourceAvailable(String resource) {
+        if (requestIsToHomePage(resource)) {
             return OK.getStatusCode();
         } else {
-            if (fileReader.returnResourceContents(resource) != null) {
+            if (fileHandler.returnResourceContents(resource).length != 0) {
                 return OK.getStatusCode();
             } else {
                 return NOT_FOUND.getStatusCode();
@@ -99,66 +78,83 @@ public class ResponseMaker {
         }
     }
 
-    private String buildStatusLine(StatusCodes statusCode) {
-        return HTTP_VERSION.getText() + statusCode.getStatusCode() + " " + statusCode.getStatusMessage();
+    public String buildStatusLine(StatusCodes statusCode) {
+        return HTTP_VERSION.getText() + statusCode.getStatusCode() + SPACE + statusCode.getStatusMessage();
     }
 
-    private boolean isHeadRequest(HttpMethods typeOfRequest) {
-        return typeOfRequest.equals(HEAD);
-    }
-
-    private ByteArrayOutputStream returnNoMessageBody(String resourceRequested) {
-        ByteArrayOutputStream output = createOutputStream();
-        byte[] response = (statusResponse(resourceRequested) + BLANK_LINE).getBytes();
-        writeToOutputStream(output, response);
-        return output;
-    }
-
-    private ByteArrayOutputStream optionsMessageBody(String resourceRequested) {
-        ByteArrayOutputStream outputStream = createOutputStream();
-        byte[] response = (
-                "" + buildStatusLine(OK) + NEW_LINE + CLOSE_CONNECTION.getText()
-        ).getBytes();
-
-        if (resourceRequested.equals("logs")) {
-            writeToOutputStream(outputStream, response);
-            writeToOutputStream(outputStream, METHODS_ALLOWED_FOR_LOGS.getText().getBytes());
-        } else {
-            writeToOutputStream(outputStream, response);
-            writeToOutputStream(outputStream, METHODS_ALLOWED_FOR_TXT_FILE.getText().getBytes());
-        }
-        return outputStream;
-    }
-
-    private ByteArrayOutputStream postMessageBody(String resourceRequested) {
-        ByteArrayOutputStream optionsResponse = optionsMessageBody(resourceRequested);
-        if (optionsResponse.toString().contains(POST.toString())) {
-            writeToOutputStream(optionsResponse, "POST is not supported".getBytes());
-            return optionsResponse;
-        } else {
-            return methodNotAllowed();
-        }
-    }
-
-    private ByteArrayOutputStream methodNotAllowed() {
+    public ByteArrayOutputStream methodNotAllowed() {
         ByteArrayOutputStream outputStream = createOutputStream();
         byte[] bytes = (buildStatusLine(METHOD_NOT_ALLOWED) + "\n" +
+                CONTENT_LENGTH_ZERO.getText() +
                 CLOSE_CONNECTION.getText() +
                 METHODS_ALLOWED_FOR_TXT_FILE.getText()).getBytes();
         writeToOutputStream(outputStream, bytes);
         return outputStream;
     }
 
-    private void writeToOutputStream(ByteArrayOutputStream outputStream, byte[] bytes) {
+    public ByteArrayOutputStream writeToOutputStream(ByteArrayOutputStream outputStream, byte[] bytes) {
         try {
             outputStream.write(bytes);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return outputStream;
     }
 
-    private ByteArrayOutputStream createOutputStream() {
+    public ByteArrayOutputStream createOutputStream() {
         return new ByteArrayOutputStream();
+    }
+
+    private ByteArrayOutputStream returnHomeDirectoryContents(String resourceRequested) {
+        List<String> files = emptyList();
+        files = getDirectoryContents(files);
+        String directoryContents = getFileNames(files);
+        byte[] statusResponse = buildDirectoryResponse(resourceRequested);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        writeToOutputStream(outputStream, statusResponse);
+        writeToOutputStream(outputStream, directoryContents.getBytes());
+        return outputStream;
+    }
+
+    private byte[] buildDirectoryResponse(String resourceRequested) {
+        return (statusResponse(resourceRequested) + NEW_LINE +
+                CONTENT_TYPE.getText() + TEXT_HTML + NEW_LINE + NEW_LINE).getBytes();
+    }
+
+    private List<String> getDirectoryContents(List<String> files) {
+        try {
+            files = fileHandler.returnDirectoryContents("public/");
+        } catch (DirectoryNotFoundException e) {
+            e.printStackTrace();
+        }
+        return files;
+    }
+
+    private ByteArrayOutputStream respondToRequest(HttpMethods typeOfRequest, String resourceRequested, List<HttpMethods> httpMethods) {
+        ByteArrayOutputStream response = new ByteArrayOutputStream();
+        for (HttpMethods method : httpMethods) {
+            if (method.equals(typeOfRequest)) {
+                response = method.getRequestHandler().response(resourceRequested);
+            }
+        }
+        return response;
+    }
+
+    private String getFileNames(List<String> files) {
+        String directoryContents = "<html><head></head><body>";
+        for (String file : files) {
+            directoryContents = directoryContents.concat(buildLink(file));
+        }
+        directoryContents = directoryContents.concat("</body></html>");
+        return directoryContents;
+    }
+
+    private String buildLink(String filePath) {
+        return "<a href=\"/" + filePath + "\">" + filePath + "</a><br>";
+    }
+
+    private boolean requestIsToHomePage(String resource) {
+        return resource.equals("/");
     }
 
 }
